@@ -1,0 +1,94 @@
+---
+title: "Trabalho de Avaliação de Políticas Sociais"
+author: "Ana Di Nur, Gabriel FIgueiredo, Tiago Brancher"
+format: pdf
+editor: visual
+---
+
+# 0) Preparativos
+
+```{r}
+library(tidyverse)
+library(data.table)
+library(basedosdados)
+```
+
+# 1) Coleta de dados
+
+## 1.1) Emendas parlamentares
+
+-   Origem dos dados: <https://www9qs.senado.leg.br/extensions/Siga_Brasil_Emendas/Siga_Brasil_Emendas.html>
+
+```{r}
+# carregar base de dados de emendas parlamentares
+
+```
+
+## 1.2) Eleições
+
+-   Origem dos dados: <https://basedosdados.org/dataset/eef764df-bde8-4905-b115-6fc23b6ba9d6?table=391047eb-b3ef-4141-a4d1-725b29018f25> \> Resultados por Candidato e Município
+
+```{r}
+# Fazer query
+query <- "SELECT
+    dados.ano AS ano,
+    dados.turno AS turno,
+    dados.sigla_uf AS sigla_uf,
+    diretorio_sigla_uf.nome AS sigla_uf_nome,
+    dados.id_municipio AS id_municipio,
+    diretorio_id_municipio.nome AS id_municipio_nome,
+    dados.cargo AS cargo,
+    dados.numero_partido AS numero_partido,
+    dados.sigla_partido AS sigla_partido,
+    dados.resultado AS resultado,
+    dados.votos AS votos
+FROM `basedosdados.br_tse_eleicoes.resultados_candidato_municipio` AS dados
+LEFT JOIN (
+    SELECT DISTINCT sigla, nome  
+    FROM `basedosdados.br_bd_diretorios_brasil.uf`
+) AS diretorio_sigla_uf
+    ON dados.sigla_uf = diretorio_sigla_uf.sigla
+LEFT JOIN (
+    SELECT DISTINCT id_municipio, nome  
+    FROM `basedosdados.br_bd_diretorios_brasil.municipio`
+) AS diretorio_id_municipio
+    ON dados.id_municipio = diretorio_id_municipio.id_municipio
+WHERE 
+    dados.ano IN (2020)
+    AND dados.cargo = 'prefeito'
+    AND CAST(dados.id_municipio AS STRING) LIKE '2%'
+"
+dt_eleicoes <- read_sql(query, billing_project_id = "pub-450900")
+setDT(dt_eleicoes)
+rm(query)
+
+# Definir variável de razão de votos
+dt_eleicoes[, votos_total := sum(votos), by = .(ano, id_municipio)]
+dt_eleicoes[, votos_razao := votos/votos_total, by = .(ano, id_municipio)]
+
+# Separar dt só com quem foi eleito
+dt_eleitos <- dt_eleicoes[resultado == "eleito",
+                          .(
+                            ano,
+                            turno,
+                            sigla_uf,
+                            id_municipio,
+                            id_municipio_nome,
+                            numero_partido,
+                            votos,
+                            votos_total,
+                            votos_razao
+                            )]
+```
+
+## 1.3) Perfil dos municípios
+
+```{r}
+
+```
+
+# 2. Estatísticas descritivas
+
+\[Mostrar que municípios em que PP ganhou ou perdeu por pouco são iguais\]
+
+# 3. Estimação
