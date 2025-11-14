@@ -1,0 +1,180 @@
+---
+title: "Trabalho de Avaliação de Políticas Sociais"
+author: "Ana Di Nur, Gabriel FIgueiredo, Tiago Brancher"
+format: pdf
+editor: visual
+---
+
+# 0) Preparativos
+
+```{r}
+library(readxl) # para obtenção dos dados
+library(basedosdados) # para obtenção dos dados
+library(dplyr) # para transformação dos dados
+library(data.table) # para transformação dos dados
+library(ggplot2) # para visualização dos dados
+```
+
+# 1) Coleta de dados
+
+## 1.1) Emendas parlamentares
+
+-   Origem dos dados: [Siga Brasil Emendas](https://www9qs.senado.leg.br/extensions/Siga_Brasil_Emendas/Siga_Brasil_Emendas.html){.uri}
+
+```{r}
+# Carregar base de dados de emendas parlamentares
+
+```
+
+## 1.2) Eleições
+
+-   Origem dos dados: [Base dos Dados \> Eleições Brasileiras](https://basedosdados.org/dataset/eef764df-bde8-4905-b115-6fc23b6ba9d6?table=391047eb-b3ef-4141-a4d1-725b29018f25){.uri} \> Resultados por Candidato e Município
+
+```{r}
+# Fazer query
+query <- "SELECT
+    dados.ano AS ano,
+    dados.turno AS turno,
+    dados.sigla_uf AS sigla_uf,
+    diretorio_sigla_uf.nome AS sigla_uf_nome,
+    dados.id_municipio AS id_municipio,
+    diretorio_id_municipio.nome AS id_municipio_nome,
+    dados.cargo AS cargo,
+    dados.numero_partido AS numero_partido,
+    dados.sigla_partido AS sigla_partido,
+    dados.resultado AS resultado,
+    dados.votos AS votos
+FROM `basedosdados.br_tse_eleicoes.resultados_candidato_municipio` AS dados
+LEFT JOIN (
+    SELECT DISTINCT sigla, nome  
+    FROM `basedosdados.br_bd_diretorios_brasil.uf`
+) AS diretorio_sigla_uf
+    ON dados.sigla_uf = diretorio_sigla_uf.sigla
+LEFT JOIN (
+    SELECT DISTINCT id_municipio, nome  
+    FROM `basedosdados.br_bd_diretorios_brasil.municipio`
+) AS diretorio_id_municipio
+    ON dados.id_municipio = diretorio_id_municipio.id_municipio
+WHERE 
+    dados.ano IN (2020)
+    AND dados.cargo = 'prefeito'
+    AND CAST(dados.id_municipio AS STRING) LIKE '2%'
+"
+dt_eleicoes <- read_sql(query, billing_project_id = "pub-450900")
+setDT(dt_eleicoes)
+rm(query)
+
+# Salvar base de dados resultante
+saveRDS()
+
+# Definir variável de razão de votos
+dt_eleicoes[, votos_total := sum(votos), by = .(ano, id_municipio)]
+dt_eleicoes[, votos_razao := votos/votos_total, by = .(ano, id_municipio)]
+
+# Separar dt com os dois mais votados de cada município
+
+
+# Retirar municípios em que nenhum dos dois primeiros colocados são do PP
+
+
+
+
+# ISSO ESTÁ ERRADO
+# Separar dt só com quem foi eleito
+dt_eleitos <- dt_eleicoes[resultado == "eleito",
+                          .(
+                            ano,
+                            turno,
+                            sigla_uf,
+                            id_municipio,
+                            id_municipio_nome,
+                            numero_partido,
+                            resultado,
+                            votos,
+                            votos_total,
+                            votos_razao
+                            )]
+```
+
+## 1.3) Características municipais
+
+-   Origem dos dados: [IBGE Cidades](https://cidades.ibge.gov.br/) \> Estados do Nordeste
+
+-   Variáveis selecionadas (advindas do Censo de 2022):
+
+    -   IDH municipal
+
+    -   PIB *per capita* municipal
+
+    -   Percentual da população com rendimento nominal mensal *per capita* de até 1/2 salário mínimo
+
+    -   Taxa de escolarização de 6 a 14 anos de idade
+
+    -   População no último censo
+
+    -   Densidade demográfica
+
+```{r}
+# carregar planilha montada a partir dos relatórios do IBGE Cidades
+dt_municipios <- read_excel("informacoes_municipios.xlsx")
+
+# renomear colunas
+nomes <- c("IDHm", "PIBpc", "percentual_renda_pc_meio_sm", "taxa_escolarizacao", "pop", "densidade_demografica")
+colnames(dt_municipios) <- nomes
+```
+
+## 1.4) Juntar bases para cada município
+
+```{r}
+
+```
+
+# 2) Estatísticas descritivas
+
+-   Mostrar que os municípios em que o candidato do PP ganhou vs. perdeu por pouco de fato são semelhantes.
+
+```{r}
+
+```
+
+# 3) Estimação
+
+-   Estimar valor adicional recebido via emendas parlamentares pelos municípios em que o candidato do PP ganhou por pouco
+
+## 3.1) Para todos os tipos de emendas
+
+```{r}
+
+```
+
+## 3.2) Para emendas individuais
+
+```{r}
+
+```
+
+## 3.3) Para emendas de bancada
+
+```{r}
+
+```
+
+## 3.4) Para emendas de comissão
+
+```{r}
+
+```
+
+## 3.5) Para emendas de relator
+
+```{r}
+
+```
+
+# 4) Teste de robustez
+
+-   Repetir a estimação para anos anteriores a 2021, mostrando que não dá efeito
+
+```{r}
+
+```
