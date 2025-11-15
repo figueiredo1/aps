@@ -44,7 +44,7 @@ library(ggplot2) # para visualização dos dados
 
 ```{r}
 # Carregar planilha montada a partir dos relatórios do IBGE Cidades
-dt_municipios <- read_excel("informacoes_municipios.xlsx")
+dt_municipios <- read_excel("Bases de dados/informacoes_municipios.xlsx")
 setDT(dt_municipios)
 
 # Renomear colunas
@@ -113,11 +113,11 @@ dt_municipios[,
 # rm(query)
 
 # Salvar base de dados resultante
-# saveRDS(dt_eleicoes, "informacoes_eleicoes.rds")
+# saveRDS(dt_eleicoes, "Bases de dados/informacoes_eleicoes.rds")
 
 
 # Carregar base de dados de eleições
-dt_eleicoes <- readRDS("informacoes_eleicoes.rds")
+dt_eleicoes <- readRDS("Bases de dados/informacoes_eleicoes.rds")
 setDT(dt_eleicoes)
 
 # Retirar primeiro turno dos municípios que tiveram segundo turno
@@ -183,7 +183,7 @@ str(dt_eleicoes)
 
 ```{r}
 # Carregar base de dados de emendas parlamentares
-dt_emendas <- read.csv2("EmendasParlamentares.csv", fileEncoding = "Latin1", encoding = "UTF-8")
+dt_emendas <- read.csv2("Bases de dados/EmendasParlamentares.csv", fileEncoding = "Latin1", encoding = "UTF-8")
 setDT(dt_emendas)
 
 # Renomear colunas
