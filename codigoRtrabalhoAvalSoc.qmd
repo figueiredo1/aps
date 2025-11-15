@@ -62,6 +62,14 @@ dt_municipios[, sigla_uf := fcase(
   sigla_uf == "potiguar, norte-rio-grandense, rio-grandense-do-norte", "RN",
   sigla_uf == "sergipano ou sergipense", "SE"
 )]
+
+# Transformar pop e densidade demográfica em variáveis numéricas
+dt_municipios[, pop := gsub("[^0-9.-]", "", pop) %>% as.numeric()]
+dt_municipios[,
+  densidade_demografica := as.numeric(
+    gsub(",", ".", gsub("[^0-9,]", "", densidade_demografica))
+  )
+]
 ```
 
 ## 1.2) Eleições
@@ -217,7 +225,7 @@ dt_emendas <- dt_emendas[ano_da_emenda == 2021]
 ## 1.4) Juntar bases para cada município
 
 ```{r}
-# Ver se algum município de dt_eleicoes não está em dt_municípios (por erro de escrita)
+# Ver se algum município de dt_eleicoes não está em dt_municípios
 municipios_dt_eleicoes <- unique(dt_eleicoes[, paste0(id_municipio_nome, sigla_uf)])
 municipios_dt_municipios <- unique(dt_municipios[, paste0(id_municipio_nome, sigla_uf)])
 for (muni in municipios_dt_eleicoes) {
@@ -232,9 +240,9 @@ dt_municipios[id_municipio_nome == "Santa Terezinha" & sigla_uf == "BA",
               id_municipio_nome := "Santa Teresinha"]
 
 # Adicionar dados sobre os municípios com eleições de interesse
-dt <- merge(dt_eleicoes, dt_municipios, all.x = T)
+dt_municipios_eleicoes <- merge(dt_eleicoes, dt_municipios, all.x = T)
 ## Verificar se houve algum NA
-colSums(is.na(dt))
+colSums(is.na(dt_municipios_eleicoes))
 
 
 
@@ -244,11 +252,13 @@ colSums(is.na(dt))
 # Adicionar dados sobre as emendas dos municípios com eleições de interesse
 ## Antes, repetir cada observação de município para cada tipo de emenda
 tipo_de_emenda <- dt_emendas[, unique(tipo_de_emenda)]
-dt2 <- dt[CJ(id_municipio, tipo_de_emenda),
-         on = "id_municipio",
-         allow.cartesian = TRUE]
+dt <- dt_municipios_eleicoes[
+  CJ(id_municipio, tipo_de_emenda),
+  on = "id_municipio",
+  allow.cartesian = TRUE
+]
 ## Agora sim, juntar as bases de dados
-dt3 <- merge(dt2, dt_emendas,
+dt2 <- merge(dt, dt_emendas,
              by = c("id_municipio", "tipo_de_emenda"),
              all.x = T)
 ## Verificar se houve algum NA
@@ -267,6 +277,53 @@ str(dt)
 -   Mostrar que os municípios em que o candidato do PP ganhou vs. perdeu por pouco de fato são semelhantes.
 
 ```{r}
+# Criar dt com médias
+dt_municipios_eleicoes_medias <- dt_municipios_eleicoes[
+  ,
+  .(
+    media_IDHm = mean(IDHm),
+    media_PIBpc = mean(PIBpc),
+    media_percentual_renda_pc_meio_sm = mean(percentual_renda_pc_meio_sm),
+    media_taxa_escolarizacao = mean(taxa_escolarizacao),
+    media_pop = mean(pop),
+    media_densidade_demografica = mean(densidade_demografica)
+  ),
+  by = vitoria_pp
+]
+# Tvz criar dt com medianas se médias não forem favoráveis
+
+# Plotar médias de quem venceu vs. não venceu
+dt_municipios_eleicoes_medias %>%
+  ggplot(aes(x = media_IDHm, fill = as.factor(vitoria_pp))) +
+  geom_bar() +
+  theme_minimal()
+
+dt_municipios_eleicoes_medias %>%
+  ggplot(aes(x = media_PIBpc, fill = as.factor(vitoria_pp))) +
+  geom_bar() +
+  theme_minimal()
+
+dt_municipios_eleicoes_medias %>%
+  ggplot(aes(x = media_percentual_renda_pc_meio_sm, fill = as.factor(vitoria_pp))) +
+  geom_bar() +
+  theme_minimal()
+
+dt_municipios_eleicoes_medias %>%
+  ggplot(aes(x = media_taxa_escolarizacao, fill = as.factor(vitoria_pp))) +
+  geom_bar() +
+  theme_minimal()
+
+dt_municipios_eleicoes_medias %>%
+  ggplot(aes(x = media_pop, fill = as.factor(vitoria_pp))) +
+  geom_bar() +
+  theme_minimal()
+
+dt_municipios_eleicoes_medias %>%
+  ggplot(aes(x = media_densidade_demografica, fill = as.factor(vitoria_pp))) +
+  geom_bar() +
+  theme_minimal()
+
+# Mostrar quais diferenças são estatisticamente significantes
 
 ```
 
@@ -274,6 +331,12 @@ str(dt)
 
 ```{r}
 
+# ALGO COMO
+# dt %>%
+#   ggplot(aes(x = razao_votos_pp, y = valor_empenhado)) +
+#   geom_line()
+
+# FAZER PARA VÁRIOS TIPOS DE EMENDAS E USAR O GAP VISUAL PARA IDENTIFICAR QUAL ESTIMAÇÃO MAIS TRARIA EFEITO
 ```
 
 # 3) Estimação
