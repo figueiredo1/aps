@@ -214,10 +214,7 @@ dt_emendas[, tipo_de_emenda := fcase(
 
 # Agregar valor empenhado por ano, tipo de emenda e município
 dt_emendas <- dt_emendas[, valor_empenhado := sum(valor_empenhado),
-                         by = .(ano_da_emenda, tipo_de_emenda, id_municipio)]
-
-# Filtrar emendas somente para 2021 para iniciar a análise (e tvz considerar que municípios eram iguais em 2020/2022, mas não depois)
-dt_emendas <- dt_emendas[ano_da_emenda == 2021]
+                         by = .(tipo_de_emenda, id_municipio)]
 ```
 
 -   Note que, após filtrar para 2021, região Nordeste e emendas direcionadas a certo município, não restam emendas de relator nem emendas de comissão. Por isso, não as analisaremos na estimação.
@@ -253,7 +250,7 @@ Agora, vamos mostrar que os municípios em que o candidato do PP ganhou vs. perd
 
 ```{r}
 # Criar dt com médias
-dt_municipios_eleicoes_medias <- dt_municipios_eleicoes[
+medias_municipios_eleicoes <- dt_municipios_eleicoes[
   ,
   .(
     media_IDHm = mean(IDHm),
@@ -267,32 +264,32 @@ dt_municipios_eleicoes_medias <- dt_municipios_eleicoes[
 ]
 
 # Plotar médias de quem venceu vs. não venceu - formatar
-dt_municipios_eleicoes_medias %>%
+medias_municipios_eleicoes %>%
   ggplot(aes(y = media_IDHm, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal()
 
-dt_municipios_eleicoes_medias %>%
+medias_municipios_eleicoes %>%
   ggplot(aes(y = media_PIBpc, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal()
 
-dt_municipios_eleicoes_medias %>%
+medias_municipios_eleicoes %>%
   ggplot(aes(y = media_percentual_renda_pc_meio_sm, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal()
 
-dt_municipios_eleicoes_medias %>%
+medias_municipios_eleicoes %>%
   ggplot(aes(y = media_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal()
 
-dt_municipios_eleicoes_medias %>%
+medias_municipios_eleicoes %>%
   ggplot(aes(y = media_pop, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal()
 
-dt_municipios_eleicoes_medias %>%
+medias_municipios_eleicoes %>%
   ggplot(aes(y = media_densidade_demografica, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal()
@@ -307,51 +304,49 @@ dt_municipios_eleicoes_medias %>%
 
 ```{r}
 # Criar dt com médias
-dt_municipios_eleicoes_medias <- dt_municipios_eleicoes[
+medianas_municipios_eleicoes <- dt_municipios_eleicoes[
   ,
   .(
-    media_IDHm = median(IDHm),
-    media_PIBpc = median(PIBpc),
-    media_percentual_renda_pc_meio_sm = median(percentual_renda_pc_meio_sm),
-    media_taxa_escolarizacao = median(taxa_escolarizacao),
-    media_pop = median(pop),
-    media_densidade_demografica = median(densidade_demografica)
+    mediana_IDHm = median(IDHm),
+    mediana_PIBpc = median(PIBpc),
+    mediana_percentual_renda_pc_meio_sm = median(percentual_renda_pc_meio_sm),
+    mediana_taxa_escolarizacao = median(taxa_escolarizacao),
+    mediana_pop = median(pop),
+    mediana_densidade_demografica = median(densidade_demografica)
   ),
   by = vitoria_pp
 ]
 
 # Plotar médias de quem venceu vs. não venceu - formatar
-dt_municipios_eleicoes_medias %>%
-  ggplot(aes(y = media_IDHm, x = as.factor(vitoria_pp))) +
+medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_IDHm, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal()
 
-dt_municipios_eleicoes_medias %>%
-  ggplot(aes(y = media_PIBpc, x = as.factor(vitoria_pp))) +
+medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_PIBpc, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal()
 
-dt_municipios_eleicoes_medias %>%
-  ggplot(aes(y = media_percentual_renda_pc_meio_sm, x = as.factor(vitoria_pp))) +
+medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_percentual_renda_pc_meio_sm, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal()
 
-dt_municipios_eleicoes_medias %>%
-  ggplot(aes(y = media_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
+medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal()
 
-dt_municipios_eleicoes_medias %>%
-  ggplot(aes(y = media_pop, x = as.factor(vitoria_pp))) +
+medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_pop, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal()
 
-dt_municipios_eleicoes_medias %>%
-  ggplot(aes(y = media_densidade_demografica, x = as.factor(vitoria_pp))) +
+medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_densidade_demografica, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal()
-
-## Parece que população e densidade demográfica se tornaram mais parecidas, apesar de PIBpc, menos
 
 # Mostrar quais diferenças são estatisticamente significantes - fazer teste de comparação de médias
 
@@ -359,7 +354,7 @@ dt_municipios_eleicoes_medias %>%
 
 -   De fato, usando a mediana, população e densidade demográfica ficaram mais parecidas. O PIBpc ficou um pouco menos parecido, mas, no todo, parece bastante razoável.
 
-    -   DÚVIDA: COMO PARECE HAVER OUTLIERS, DEVERÍAMOS TIRÁ-LOS DA AMOSTRA?
+    -   DÚVIDA: COMO PARECE HAVER MUNICÍPIOS OUTLIERS, DEVERÍAMOS TIRÁ-LOS DA AMOSTRA?
 
 # 3) Estimação
 
@@ -369,6 +364,16 @@ Para cada análise (todas as emendas vs. emendas individuais vs. emendas de banc
 
 ```{r}
 # Juntar bases de dados
+## Somar todas as emendas por município
+dt_emendas_total <- dt_emendas[,
+                               .(valor_empenhado = sum(valor_empenhado)),
+                               by = id_municipio]
+## Juntar bases de dados
+dt <- merge(dt_municipios_eleicoes, dt_emendas_total, by = "id_municipio", all.x = T)
+## Verificar quantos NAs (municípios sem emendas) houve
+colSums(is.na(dt))
+## Preencher valores NA com 0
+
 
 # Checar base de dados
 str(dt_todas)
@@ -378,6 +383,8 @@ str(dt_todas)
 # Fazer a estimação
 
 ```
+
+-   DÚVIDA: 173 de 195 NÃO TEREM RECEBIDO QUALQUER EMENDA PARECE ALTO DEMAIS! CONFERIR COM NOMES DE MUNICÍPIOS, SIGA BRASIL
 
 ## 3.2) Para emendas individuais (inclusive Pix)
 
