@@ -240,7 +240,7 @@ dt_municipios[id_municipio_nome == "Santa Terezinha" & sigla_uf == "BA",
               id_municipio_nome := "Santa Teresinha"]
 
 # Adicionar dados sobre os municípios com eleições de interesse
-dt_municipios_eleicoes <- merge(dt_eleicoes, dt_municipios, all.x = T)
+dt_municipios_eleicoes <- merge(dt_eleicoes, dt_municipios, all.y = T)
 ## Verificar se houve algum NA
 colSums(is.na(dt_municipios_eleicoes))
 
@@ -260,7 +260,7 @@ dt <- dt_municipios_eleicoes[
 ## Agora sim, juntar as bases de dados
 dt2 <- merge(dt, dt_emendas,
              by = c("id_municipio", "tipo_de_emenda"),
-             all.x = T)
+             all.y = T)
 ## Verificar se houve algum NA
 colSums(is.na(dt3))
 ## Assinalar valor empenhado 0 aos ___ pares de município e ano sem emendas
@@ -274,7 +274,9 @@ str(dt)
 
 # 2) Estatísticas descritivas
 
--   Mostrar que os municípios em que o candidato do PP ganhou vs. perdeu por pouco de fato são semelhantes.
+-   Mostrar que os municípios em que o candidato do PP ganhou vs. perdeu por pouco de fato são semelhantes
+
+## 2.1) Comparação de médias
 
 ```{r}
 # Criar dt com médias
@@ -290,50 +292,107 @@ dt_municipios_eleicoes_medias <- dt_municipios_eleicoes[
   ),
   by = vitoria_pp
 ]
-# Tvz criar dt com medianas se médias não forem favoráveis
 
 # Plotar médias de quem venceu vs. não venceu
 dt_municipios_eleicoes_medias %>%
-  ggplot(aes(x = media_IDHm, fill = as.factor(vitoria_pp))) +
-  geom_bar() +
+  ggplot(aes(y = media_IDHm, x = as.factor(vitoria_pp))) +
+  geom_col() +
   theme_minimal()
 
 dt_municipios_eleicoes_medias %>%
-  ggplot(aes(x = media_PIBpc, fill = as.factor(vitoria_pp))) +
-  geom_bar() +
+  ggplot(aes(y = media_PIBpc, x = as.factor(vitoria_pp))) +
+  geom_col() +
   theme_minimal()
 
 dt_municipios_eleicoes_medias %>%
-  ggplot(aes(x = media_percentual_renda_pc_meio_sm, fill = as.factor(vitoria_pp))) +
-  geom_bar() +
+  ggplot(aes(y = media_percentual_renda_pc_meio_sm, x = as.factor(vitoria_pp))) +
+  geom_col() +
   theme_minimal()
 
 dt_municipios_eleicoes_medias %>%
-  ggplot(aes(x = media_taxa_escolarizacao, fill = as.factor(vitoria_pp))) +
-  geom_bar() +
+  ggplot(aes(y = media_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
+  geom_col() +
   theme_minimal()
 
 dt_municipios_eleicoes_medias %>%
-  ggplot(aes(x = media_pop, fill = as.factor(vitoria_pp))) +
-  geom_bar() +
+  ggplot(aes(y = media_pop, x = as.factor(vitoria_pp))) +
+  geom_col() +
   theme_minimal()
 
 dt_municipios_eleicoes_medias %>%
-  ggplot(aes(x = media_densidade_demografica, fill = as.factor(vitoria_pp))) +
-  geom_bar() +
+  ggplot(aes(y = media_densidade_demografica, x = as.factor(vitoria_pp))) +
+  geom_col() +
   theme_minimal()
 
-# Mostrar quais diferenças são estatisticamente significantes
+## Parece que população e densidade demográfica são mais diferentes - olhar para medianas, talvez sejam poucas cidades com vitória do PP puxando essa média para cima
+
+# Mostrar quais diferenças são estatisticamente significantes - fazer teste de comparação de médias
 
 ```
 
--   Plotar gráfico (x = margem de votos do candidato do PP, y = valor de emendas recebido em AAAA) em busca da descontinuidade
+## 2.2) Comparação de medianas
+
+```{r}
+# Criar dt com médias
+dt_municipios_eleicoes_medias <- dt_municipios_eleicoes[
+  ,
+  .(
+    media_IDHm = median(IDHm),
+    media_PIBpc = median(PIBpc),
+    media_percentual_renda_pc_meio_sm = median(percentual_renda_pc_meio_sm),
+    media_taxa_escolarizacao = median(taxa_escolarizacao),
+    media_pop = median(pop),
+    media_densidade_demografica = median(densidade_demografica)
+  ),
+  by = vitoria_pp
+]
+
+# Plotar médias de quem venceu vs. não venceu
+dt_municipios_eleicoes_medias %>%
+  ggplot(aes(y = media_IDHm, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal()
+
+dt_municipios_eleicoes_medias %>%
+  ggplot(aes(y = media_PIBpc, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal()
+
+dt_municipios_eleicoes_medias %>%
+  ggplot(aes(y = media_percentual_renda_pc_meio_sm, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal()
+
+dt_municipios_eleicoes_medias %>%
+  ggplot(aes(y = media_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal()
+
+dt_municipios_eleicoes_medias %>%
+  ggplot(aes(y = media_pop, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal()
+
+dt_municipios_eleicoes_medias %>%
+  ggplot(aes(y = media_densidade_demografica, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal()
+
+## Parece que população e densidade demográfica se tornaram mais parecidas, mas PIBpc, menos
+
+# Mostrar quais diferenças são estatisticamente significantes - fazer teste de comparação de médias
+
+```
+
+## 2.3) Contraste visual do valor de emendas
+
+-   Plotar gráfico (y = margem de votos do candidato do PP, x = valor de emendas recebido em AAAA) em busca da descontinuidade
 
 ```{r}
 
 # ALGO COMO
 # dt %>%
-#   ggplot(aes(x = razao_votos_pp, y = valor_empenhado)) +
+#   ggplot(aes(y = razao_votos_pp, x = valor_empenhado)) +
 #   geom_line()
 
 # FAZER PARA VÁRIOS TIPOS DE EMENDAS E USAR O GAP VISUAL PARA IDENTIFICAR QUAL ESTIMAÇÃO MAIS TRARIA EFEITO
