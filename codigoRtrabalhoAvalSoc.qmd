@@ -32,57 +32,57 @@ library(ggplot2) # para visualização dos dados
 
 ```{r}
 # Fazer query
-query <- "SELECT
-    dados.ano AS ano,
-    dados.turno AS turno,
-    dados.sigla_uf AS sigla_uf,
-    diretorio_sigla_uf.nome AS sigla_uf_nome,
-    dados.id_municipio AS id_municipio,
-    diretorio_id_municipio.nome AS id_municipio_nome,
-    dados.cargo AS cargo,
-    dados.numero_partido AS numero_partido,
-    dados.sigla_partido AS sigla_partido,
-    dados.resultado AS resultado,
-    dados.votos AS votos
-FROM `basedosdados.br_tse_eleicoes.resultados_candidato_municipio` AS dados
-LEFT JOIN (
-    SELECT DISTINCT sigla, nome  
-    FROM `basedosdados.br_bd_diretorios_brasil.uf`
-) AS diretorio_sigla_uf
-    ON dados.sigla_uf = diretorio_sigla_uf.sigla
-LEFT JOIN (
-    SELECT DISTINCT id_municipio, nome  
-    FROM `basedosdados.br_bd_diretorios_brasil.municipio`
-) AS diretorio_id_municipio
-    ON dados.id_municipio = diretorio_id_municipio.id_municipio
-WHERE 
-    dados.ano IN (2020)
-    AND dados.cargo = 'prefeito'
-    AND CAST(dados.id_municipio AS STRING) LIKE '2%'
-"
-dt_eleicoes <- read_sql(query, billing_project_id = "pub-450900")
-setDT(dt_eleicoes)
-rm(query)
+# query <- "SELECT
+#     dados.ano AS ano,
+#     dados.turno AS turno,
+#     dados.sigla_uf AS sigla_uf,
+#     diretorio_sigla_uf.nome AS sigla_uf_nome,
+#     dados.id_municipio AS id_municipio,
+#     diretorio_id_municipio.nome AS id_municipio_nome,
+#     dados.cargo AS cargo,
+#     dados.numero_partido AS numero_partido,
+#     dados.sigla_partido AS sigla_partido,
+#     dados.resultado AS resultado,
+#     dados.votos AS votos
+# FROM `basedosdados.br_tse_eleicoes.resultados_candidato_municipio` AS dados
+# LEFT JOIN (
+#     SELECT DISTINCT sigla, nome  
+#     FROM `basedosdados.br_bd_diretorios_brasil.uf`
+# ) AS diretorio_sigla_uf
+#     ON dados.sigla_uf = diretorio_sigla_uf.sigla
+# LEFT JOIN (
+#     SELECT DISTINCT id_municipio, nome  
+#     FROM `basedosdados.br_bd_diretorios_brasil.municipio`
+# ) AS diretorio_id_municipio
+#     ON dados.id_municipio = diretorio_id_municipio.id_municipio
+# WHERE 
+#     dados.ano IN (2020)
+#     AND dados.cargo = 'prefeito'
+#     AND CAST(dados.id_municipio AS STRING) LIKE '2%'
+# "
+# dt_eleicoes <- read_sql(query, billing_project_id = "pub-450900")
+# setDT(dt_eleicoes)
+# rm(query)
 
 # Salvar base de dados resultante
-saveRDS()
+# saveRDS(dt_eleicoes, "informacoes_eleicoes.rds")
+
+# Carregar base de dados de eleições
+dt_eleicoes <- readRDS("informacoes_eleicoes.rds")
 
 # Definir variável de razão de votos
 dt_eleicoes[, votos_total := sum(votos), by = .(ano, id_municipio)]
-dt_eleicoes[, votos_razao := votos/votos_total, by = .(ano, id_municipio)]
+dt_eleicoes[, votos_razao_teste := votos/votos_total]
+
+# Para municípios com segundo turno, deletar as linhas do primeiro turno
+
 
 # Separar dt com os dois mais votados de cada município
-
-
-# Retirar municípios em que nenhum dos dois primeiros colocados são do PP
-
-
-
-
-# ISSO ESTÁ ERRADO
-# Separar dt só com quem foi eleito
-dt_eleitos <- dt_eleicoes[resultado == "eleito",
-                          .(
+## Criar coluna auxiliar que mostra os mais votados
+dt_eleicoes[, rank_municipio := , by = .(ano, id_municipio)] # DESCOBRIR COMO RANKEAR
+## Selecionar só os dois candidatos com maior razão de votos
+dt_eleicoes <- dt_eleicoes[rank_municipio < 3,
+                       .(
                             ano,
                             turno,
                             sigla_uf,
@@ -93,7 +93,13 @@ dt_eleitos <- dt_eleicoes[resultado == "eleito",
                             votos,
                             votos_total,
                             votos_razao
-                            )]
+                       ),
+                       by = .(ano, id_municipio)]
+## Deletar coluna auxiliar
+dt_eleicoes[, rank_municipio := NULL]
+
+# Retirar municípios em que nenhum dos dois primeiros colocados são do PP
+
 ```
 
 ## 1.3) Características municipais
@@ -119,7 +125,7 @@ dt_eleitos <- dt_eleicoes[resultado == "eleito",
 dt_municipios <- read_excel("informacoes_municipios.xlsx")
 
 # renomear colunas
-nomes <- c("IDHm", "PIBpc", "percentual_renda_pc_meio_sm", "taxa_escolarizacao", "pop", "densidade_demografica")
+nomes <- c("nome_muni", "gentilico_uf", "IDHm", "PIBpc", "percentual_renda_pc_meio_sm", "taxa_escolarizacao", "pop", "densidade_demografica")
 colnames(dt_municipios) <- nomes
 ```
 
