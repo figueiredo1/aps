@@ -236,6 +236,11 @@ dt <- merge(dt_eleicoes, dt_municipios, all.x = T)
 ## Verificar se houve algum NA
 colSums(is.na(dt))
 
+
+
+
+### FAZER FUNCIONAR:
+
 # Adicionar dados sobre as emendas dos municípios com eleições de interesse
 ## Antes, repetir cada observação de município para cada tipo de emenda
 tipo_de_emenda <- dt_emendas[, unique(tipo_de_emenda)]
@@ -302,7 +307,7 @@ str(dt_todas)
 dt_individual <- dt[
   tipo_emenda %in% c("individual - finalidade definida", "individual - 'pix"),
   valor_empenhado := sum(valor_empenhado),
-  by = .(ano, id_municipio)]
+  by = .(ano, id_municipio)
 ]
 dt_individual[, tipo_emenda := NULL]
 dt_individual[, valor_empenhado := NULL]
