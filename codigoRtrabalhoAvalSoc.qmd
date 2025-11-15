@@ -12,23 +12,61 @@ library(readxl) # para obtenção dos dados
 library(basedosdados) # para obtenção dos dados
 library(dplyr) # para transformação dos dados
 library(data.table) # para transformação dos dados
+library(janitor) # para transformação dos dados
 library(ggplot2) # para visualização dos dados
 ```
 
 # 1) Coleta de dados
 
-## 1.1) Emendas parlamentares
+## 1.1) Características municipais
 
--   Origem dos dados: [Siga Brasil Emendas](https://www9qs.senado.leg.br/extensions/Siga_Brasil_Emendas/Siga_Brasil_Emendas.html){.uri}
+-   Origem dos dados: Acessar [IBGE Cidades](https://cidades.ibge.gov.br/) \> Selecionar UFs do Nordeste \> Selecionar variáveis de interesse
+
+    -   Variáveis selecionadas (hipótese: perfil não mudou significativamente entre os anos de coleta dos dados e o ano da eleição):
+
+        -   IDH municipal (2010)
+
+            -   ATENÇÃO: SERÁ QUE NÃO FAZ TEMPO DEMAIS? ACHO QUE SIM
+
+        -   PIB *per capita* municipal (2021)
+
+        -   Percentual da população com rendimento nominal mensal *per capita* de até 1/2 salário mínimo (2010)
+
+            -   ATENÇÃO: SERÁ QUE NÃO FAZ TEMPO DEMAIS? ACHO QUE SIM
+
+        -   Taxa de escolarização de 6 a 14 anos de idade (2022)
+
+        -   População no último censo (2022)
+
+        -   Densidade demográfica (2022)
 
 ```{r}
-# Carregar base de dados de emendas parlamentares
+# Carregar planilha montada a partir dos relatórios do IBGE Cidades
+dt_municipios <- read_excel("informacoes_municipios.xlsx")
+setDT(dt_municipios)
 
+# Renomear colunas
+nomes <- c("id_municipio_nome", "sigla_uf", "IDHm", "PIBpc", "percentual_renda_pc_meio_sm", "taxa_escolarizacao", "pop", "densidade_demografica")
+colnames(dt_municipios) <- nomes
+rm(nomes)
+
+# Transformar gentílico na sigla do UF
+dt_municipios[, sigla_uf := fcase(
+  sigla_uf == "alagoano", "AL",
+  sigla_uf == "baiano", "BA",
+  sigla_uf == "cearense", "CE",
+  sigla_uf == "maranhense", "MA",
+  sigla_uf == "paraibano", "PB",
+  sigla_uf == "pernambucano", "PE",
+  sigla_uf == "piauiense", "PI",
+  sigla_uf == "potiguar, norte-rio-grandense, rio-grandense-do-norte", "RN",
+  sigla_uf == "sergipano ou sergipense", "SE"
+)]
 ```
 
 ## 1.2) Eleições
 
--   Origem dos dados: [Base dos Dados \> Eleições Brasileiras](https://basedosdados.org/dataset/eef764df-bde8-4905-b115-6fc23b6ba9d6?table=391047eb-b3ef-4141-a4d1-725b29018f25){.uri} \> Resultados por Candidato e Município
+-   Origem dos dados: Acessar [Base dos Dados \> Eleições Brasileiras](https://basedosdados.org/dataset/eef764df-bde8-4905-b115-6fc23b6ba9d6?table=391047eb-b3ef-4141-a4d1-725b29018f25){.uri} \> Resultados por Candidato e Município
 
 ```{r}
 # Fazer query
@@ -57,8 +95,8 @@ library(ggplot2) # para visualização dos dados
 #     ON dados.id_municipio = diretorio_id_municipio.id_municipio
 # WHERE 
 #     dados.ano IN (2020)
-#     AND dados.cargo = 'prefeito'
-#     AND CAST(dados.id_municipio AS STRING) LIKE '2%'
+#     AND dados.cargo = "prefeito"
+#     AND CAST(dados.id_municipio AS STRING) LIKE "2%"
 # "
 # dt_eleicoes <- read_sql(query, billing_project_id = "pub-450900")
 # setDT(dt_eleicoes)
@@ -67,77 +105,167 @@ library(ggplot2) # para visualização dos dados
 # Salvar base de dados resultante
 # saveRDS(dt_eleicoes, "informacoes_eleicoes.rds")
 
+
 # Carregar base de dados de eleições
 dt_eleicoes <- readRDS("informacoes_eleicoes.rds")
+setDT(dt_eleicoes)
 
-# Definir variável de razão de votos
-dt_eleicoes[, votos_total := sum(votos), by = .(ano, id_municipio)]
-dt_eleicoes[, votos_razao_teste := votos/votos_total]
+# Retirar primeiro turno dos municípios que tiveram segundo turno
+municipios_com_segundo_turno <- dt_eleicoes[turno == 2, unique(id_municipio)]
+dt_eleicoes <- dt_eleicoes[!(turno == 1 &
+                               id_municipio %in% municipios_com_segundo_turno)]
+rm(municipios_com_segundo_turno)
 
-# Para municípios com segundo turno, deletar as linhas do primeiro turno
+# Selecionar os dois candidatos mais votados
+setorder(dt_eleicoes, -votos)
+dt_eleicoes <- dt_eleicoes[, head(.SD, 2), by = id_municipio]
 
-
-# Separar dt com os dois mais votados de cada município
-## Criar coluna auxiliar que mostra os mais votados
-dt_eleicoes[, rank_municipio := , by = .(ano, id_municipio)] # DESCOBRIR COMO RANKEAR
-## Selecionar só os dois candidatos com maior razão de votos
-dt_eleicoes <- dt_eleicoes[rank_municipio < 3,
-                       .(
-                            ano,
-                            turno,
-                            sigla_uf,
-                            id_municipio,
-                            id_municipio_nome,
-                            numero_partido,
-                            resultado,
-                            votos,
-                            votos_total,
-                            votos_razao
-                       ),
-                       by = .(ano, id_municipio)]
-## Deletar coluna auxiliar
-dt_eleicoes[, rank_municipio := NULL]
+# Definir razão de votos dos top 2 (contando somente os votos desses 2)
+dt_eleicoes[, votos_total := sum(votos), by = id_municipio]
+dt_eleicoes[, votos_razao := votos/votos_total]
 
 # Retirar municípios em que nenhum dos dois primeiros colocados são do PP
+municipios_com_candidato_pp <- dt_eleicoes[sigla_partido == "PP", unique(id_municipio)]
+dt_eleicoes <- dt_eleicoes[id_municipio %in% municipios_com_candidato_pp]
+rm(municipios_com_candidato_pp)
 
+# Selecionar municípios em que a margem de vitória foi de 5% ou menos
+dt_eleicoes <- dt_eleicoes[votos_razao >= 0.45 & votos_razao <= 0.55]
+
+# Criar dummy que indica se o candidato do PP ganhou
+municipios_com_vitoria_pp <- dt_eleicoes[sigla_partido == "PP" & resultado == "eleito",
+                                         unique(id_municipio)]
+dt_eleicoes[, vitoria_pp := ifelse(id_municipio %in% municipios_com_vitoria_pp, 1, 0)]
+rm(municipios_com_vitoria_pp)
+
+# Selecionar só colunas e linhas relevantes
+dt_eleicoes <- dt_eleicoes[
+  sigla_partido == "PP",
+  .(
+    id_municipio,
+    id_municipio_nome,
+    sigla_uf,
+    votos_razao,
+    vitoria_pp
+  )
+]
+setnames(dt_eleicoes, "votos_razao", "votos_razao_pp")
+
+# Dar uma olhada na base de dados resultante
+str(dt_eleicoes)
 ```
 
-## 1.3) Características municipais
+-   Note que:
 
--   Origem dos dados: [IBGE Cidades](https://cidades.ibge.gov.br/) \> Estados do Nordeste
+    -   Há 1794 municípios nordestinos
 
--   Variáveis selecionadas (advindas do Censo de 2022):
+        -   1792 (99,9%) deles tiveram eleições municipais (Fernando de Noronha e \_\_\_\_\_\_, não)
 
-    -   IDH municipal
+            -   477 (26,6%) deles tiveram um candidato do PP entre os dois candidatos mais votados
 
-    -   PIB *per capita* municipal
+                -   195 (40,6%) desses tiveram uma eleição acirrada (isto é, seu candidato eleito teve no máximo 55% dos votos)
 
-    -   Percentual da população com rendimento nominal mensal *per capita* de até 1/2 salário mínimo
+                    -   Note que quase atinge os 200 indicados como referência para a lei dos grandes números pela profa. Beti Kira nas aulas de Estatística!
 
-    -   Taxa de escolarização de 6 a 14 anos de idade
+## 1.3) Emendas parlamentares
 
-    -   População no último censo
-
-    -   Densidade demográfica
+-   Origem dos dados: [Portal da Transparência - CGU \> Emendas Parlamentares](https://portaldatransparencia.gov.br/download-de-dados/emendas-parlamentares)
 
 ```{r}
-# carregar planilha montada a partir dos relatórios do IBGE Cidades
-dt_municipios <- read_excel("informacoes_municipios.xlsx")
+# Carregar base de dados de emendas parlamentares
+dt_emendas <- read.csv2("EmendasParlamentares.csv", fileEncoding = "Latin1", encoding = "UTF-8")
+setDT(dt_emendas)
 
-# renomear colunas
-nomes <- c("nome_muni", "gentilico_uf", "IDHm", "PIBpc", "percentual_renda_pc_meio_sm", "taxa_escolarizacao", "pop", "densidade_demografica")
-colnames(dt_municipios) <- nomes
+# Renomear colunas
+colnames(dt_emendas) <- make_clean_names(colnames(dt_emendas))
+setnames(dt_emendas, "codigo_municipio_ibge", "id_municipio")
+
+# Selecionar dados relevantes
+dt_emendas <- dt_emendas[
+  ano_da_emenda > 2020 & regiao == "Nordeste" & id_municipio != "Sem informação",
+  .(
+     ano_da_emenda,
+     tipo_de_emenda,
+     id_municipio,
+     valor_empenhado
+  )
+]
+
+# Ver quais tipos de emendas restam
+dt_emendas[, unique(tipo_de_emenda)]
+
+# Simplificar nome do tipo de emenda
+dt_emendas[, tipo_de_emenda := fcase(
+  tipo_de_emenda == "Emenda Individual - Transferências com Finalidade Definida", "individual - finalidade definida",
+  tipo_de_emenda == "Emenda Individual - Transferências Especiais", "individual - 'pix'",
+  tipo_de_emenda == "Emenda de Bancada", "bancada",
+  tipo_de_emenda == "Emenda de Comissão", "comissão"
+)]
+
+# Agregar valor empenhado por ano, tipo de emenda e município
+dt_emendas <- dt_emendas[, valor_empenhado := sum(valor_empenhado),
+                         by = .(ano_da_emenda, tipo_de_emenda, id_municipio)]
+
+# Filtrar emendas somente para 2021 para iniciar a análise (e tvz considerar que municípios eram iguais em 2020/2022, mas não depois)
+dt_emendas <- dt_emendas[ano_da_emenda == 2021]
 ```
+
+-   Note que, após filtrar para após 2020, para a região Nordeste e para emendas direcionadas a certo município, não restam emendas de relator. Por isso, não as analisaremos na estimação.
+
+-   Note que, após filtrar para 2021, não restam emendas de comissão. Por isso, não as analisaremos na estimação.
 
 ## 1.4) Juntar bases para cada município
 
 ```{r}
+# Ver se algum município de dt_eleicoes não está em dt_municípios (por erro de escrita)
+municipios_dt_eleicoes <- unique(dt_eleicoes[, paste0(id_municipio_nome, sigla_uf)])
+municipios_dt_municipios <- unique(dt_municipios[, paste0(id_municipio_nome, sigla_uf)])
+for (muni in municipios_dt_eleicoes) {
+  if (!muni %in% municipios_dt_municipios) {
+    print(muni)
+  }
+}
+rm(municipios_dt_eleicoes, municipios_dt_municipios, muni)
 
+# Renomear municípios de dt_municipios fora do padrão de dt_eleicoes
+dt_municipios[id_municipio_nome == "Santa Terezinha" & sigla_uf == "BA",
+              id_municipio_nome := "Santa Teresinha"]
+
+# Adicionar dados sobre os municípios com eleições de interesse
+dt <- merge(dt_eleicoes, dt_municipios, all.x = T)
+## Verificar se houve algum NA
+colSums(is.na(dt))
+
+# Adicionar dados sobre as emendas dos municípios com eleições de interesse
+## Antes, repetir cada observação de município para cada tipo de emenda
+tipo_de_emenda <- dt_emendas[, unique(tipo_de_emenda)]
+dt2 <- dt[CJ(id_municipio, tipo_de_emenda),
+         on = "id_municipio",
+         allow.cartesian = TRUE]
+## Agora sim, juntar as bases de dados
+dt3 <- merge(dt2, dt_emendas,
+             by = c("id_municipio", "tipo_de_emenda"),
+             all.x = T)
+## Verificar se houve algum NA
+colSums(is.na(dt3))
+## Assinalar valor empenhado 0 aos ___ pares de município e ano sem emendas
+
+# Visualizar base de dados final
+str(dt)
+
+# Deletar datatables intermediários
+# rm(dt_municipios, dt_eleicoes, dt_emendas)
 ```
 
 # 2) Estatísticas descritivas
 
 -   Mostrar que os municípios em que o candidato do PP ganhou vs. perdeu por pouco de fato são semelhantes.
+
+```{r}
+
+```
+
+-   Plotar gráfico (x = margem de votos do candidato do PP, y = valor de emendas recebido em AAAA) em busca da descontinuidade
 
 ```{r}
 
@@ -150,36 +278,86 @@ colnames(dt_municipios) <- nomes
 ## 3.1) Para todos os tipos de emendas
 
 ```{r}
+# Agregar valor empenhado para todos os tipos de emenda
+dt_todas <- dt[,
+               valor_empenhado := sum(valor_empenhado),
+               by = .(ano, id_municipio)]
+dt_todas[, tipo_emenda := NULL]
+dt_todas[, valor_empenhado := NULL]
+dt_todas <- unique(dt_todas)
+
+# Checar base de dados
+str(dt_todas)
+
+# Fazer a estimação
 
 ```
 
-## 3.2) Para emendas individuais
+## 3.2) Por tipo de emenda
+
+### 3.2.1) Para emendas individuais (inclusive Pix)
 
 ```{r}
+# Filtrar por tipo de emenda
+dt_individual <- dt[
+  tipo_emenda %in% c("individual - finalidade definida", "individual - 'pix"),
+  valor_empenhado := sum(valor_empenhado),
+  by = .(ano, id_municipio)]
+]
+dt_individual[, tipo_emenda := NULL]
+dt_individual[, valor_empenhado := NULL]
+dt_individual <- unique(dt_individual)
+
+# Checar base de dados
+str(dt_individual)
+
+# Fazer a estimação
 
 ```
 
-## 3.3) Para emendas de bancada
+### 3.2.2) Para emendas individuais (exceto Pix)
 
 ```{r}
+# Filtrar por tipo de emenda
+dt_individual_sem_pix <- dt[tipo_de_emenda == "individual - finalidade definida"]
+
+# Checar base de dados
+str(dt_individual_sem_pix)
+
+# Fazer a estimação
 
 ```
 
-## 3.4) Para emendas de comissão
+### 3.2.3) Para emendas individuais (somente Pix)
 
 ```{r}
+# Filtrar por tipo de emenda
+dt_individual_somente_pix <- dt[tipo_de_emenda == "individual - 'pix'"]
+
+# Checar base de dados
+str(dt_individual_somente_pix)
+
+# Fazer a estimação
 
 ```
 
-## 3.5) Para emendas de relator
+### 3.2.4) Para emendas de bancada
 
 ```{r}
+# Filtrar por tipo de emenda
+dt_bancada <- dt[tipo_de_emenda == "bancada"]
+dt_bancada <- unique(dt_bancada)
+
+# Checar base de dados
+str(dt_bancada)
+
+# Fazer a estimação
 
 ```
 
 # 4) Teste de robustez
 
--   Repetir a estimação para anos anteriores a 2021, mostrando que não dá efeito
+-   Repetir a estimação para anos anteriores a 2021, mostrando que não dá efeito (se tudo der certo)
 
 ```{r}
 
