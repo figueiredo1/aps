@@ -422,6 +422,8 @@ str(dt_todas)
 
 ## 3.2) Por tipo de emenda
 
+-   Tive dificuldade quando tentei juntar as bases de dados antes e, depois, filtrar ou somar os valores de emendas. Acho melhor merge dt_municipios_eleicoes com dt_emendas a cada exercício
+
 ### 3.2.1) Para emendas individuais (inclusive Pix)
 
 ```{r}
