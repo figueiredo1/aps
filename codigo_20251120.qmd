@@ -197,10 +197,10 @@ setDT(dt_emendas)
 
 # Renomear colunas
 colnames(dt_emendas) <- make_clean_names(colnames(dt_emendas))
-setnames(dt_emendas, "funcional_localidade", "id_municipio_nome")
+setnames(dt_emendas, "", "id_municipio_nome")
 
 # Retirar colunas utilizadas somente para filtros
-[]
+dt_emendas <- dt_emendas[, .(NOMES DAS COLUNAS)]
 
 # Selecionar dados relevantes
 dt_emendas <- dt_emendas[
