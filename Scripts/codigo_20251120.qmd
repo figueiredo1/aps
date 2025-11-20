@@ -1,11 +1,12 @@
 ---
 title: "Trabalho de Avaliação de Políticas Sociais"
-author: "Ana Di Nur, Gabriel FIgueiredo, Tiago Brancher"
+author: "Ana Di Nur, Gabriel Figueiredo, Tiago Brancher"
 format: pdf
 editor: visual
 ---
 
-\*Diferença em relação à v1: vou juntar dt_municipios_eleicoes com dt_emendas antes de cada exercício em vez de tentar juntar tudo no começo e ir alterando depois.
+-   Diferença em relação à v1: Vou juntar dt_municipios_eleicoes com dt_emendas antes de cada exercício em vez de tentar juntar tudo no começo e ir alterando depois.
+-   Diferença em relação à versão de 11.11.2025: Mudei os dados selecionados de características municipais (para serem mais recentes) e a fonte de dados de emendas parlamentares (para que o ano da emenda refletisse seu ano de empenho, não proposição)
 
 # 0) Preparativos
 
@@ -24,23 +25,19 @@ library(ggplot2) # para visualização dos dados
 
 -   Origem dos dados: Acessar [IBGE Cidades](https://cidades.ibge.gov.br/) \> Selecionar UFs do Nordeste \> Selecionar variáveis de interesse
 
-    -   Variáveis selecionadas (hipótese: perfil não mudou significativamente entre os anos de coleta dos dados e o ano da eleição):
+    -   Hipótese: Perfil municipal não mudou significativamente entre os anos de coleta dos dados (2021, 2022) e o ano da eleição (2021)
 
-        -   IDH municipal (2010)
-
-            -   DÚVIDA: SERÁ QUE NÃO FAZ TEMPO DEMAIS? ACHO QUE SIM
-
-        -   PIB *per capita* municipal (2021)
-
-        -   Percentual da população com rendimento nominal mensal *per capita* de até 1/2 salário mínimo (2010)
-
-            -   DÚVIDA: SERÁ QUE NÃO FAZ TEMPO DEMAIS? ACHO QUE SIM
-
-        -   Taxa de escolarização de 6 a 14 anos de idade (2022)
+    -   Variáveis selecionadas:
 
         -   População no último censo (2022)
 
         -   Densidade demográfica (2022)
+
+        -   PIB *per capita* municipal (2021)
+
+        -   Taxa de escolarização de 6 a 14 anos de idade (2022)
+
+        -   Mortalidade infantil (2023)
 
 ```{r}
 # Carregar planilha montada a partir dos relatórios do IBGE Cidades
