@@ -44,7 +44,7 @@ library(ggplot2) # para visualização dos dados
 
 ```{r}
 # Carregar planilha montada a partir dos relatórios do IBGE Cidades
-dt_municipios <- read_excel("Bases de dados/informacoes_municipios.xlsx")
+dt_municipios <- read_excel("Bases de dados/IBGE_municipios.xlsx")
 setDT(dt_municipios)
 
 # Renomear colunas
@@ -113,11 +113,11 @@ dt_municipios[,
 # rm(query)
 
 # Salvar base de dados resultante
-# saveRDS(dt_eleicoes, "Bases de dados/informacoes_eleicoes.rds")
+# saveRDS(dt_eleicoes, "Bases de dados/TSE_eleicoes.rds")
 
 
 # Carregar base de dados de eleições
-dt_eleicoes <- readRDS("Bases de dados/informacoes_eleicoes.rds")
+dt_eleicoes <- readRDS("Bases de dados/TSE_eleicoes.rds")
 setDT(dt_eleicoes)
 
 # Retirar primeiro turno dos municípios que tiveram segundo turno
@@ -175,7 +175,7 @@ str(dt_eleicoes)
 
                 -   195 (40,6%) desses tiveram uma eleição acirrada (isto é, seu candidato eleito teve no máximo 55% dos votos)
 
-                    -   Note que quase atinge os 200 indicados como referência para a lei dos grandes números pela profa. Beti Kira nas aulas de Estatística!
+                    -   Note que quase se atinge os 200 indicados como referência para a lei dos grandes números pela profa. Beti Kira nas aulas de Estatística!
 
 ## 1.3) Emendas parlamentares
 
@@ -183,7 +183,7 @@ str(dt_eleicoes)
 
 ```{r}
 # Carregar base de dados de emendas parlamentares
-dt_emendas <- read.csv2("Bases de dados/EmendasParlamentares.csv", fileEncoding = "Latin1", encoding = "UTF-8")
+dt_emendas <- read.csv2("Bases de dados/CGU_emendas_parlamentares.csv", fileEncoding = "Latin1", encoding = "UTF-8")
 setDT(dt_emendas)
 
 # Renomear colunas
@@ -207,13 +207,14 @@ dt_emendas[, unique(tipo_de_emenda)]
 # Simplificar nome do tipo de emenda
 dt_emendas[, tipo_de_emenda := fcase(
   tipo_de_emenda == "Emenda Individual - Transferências com Finalidade Definida", "individual - finalidade definida",
-  tipo_de_emenda == "Emenda Individual - Transferências Especiais", "individual - 'pix'",
+  tipo_de_emenda == "Emenda Individual - Transferências Especiais", "individual - pix",
   tipo_de_emenda == "Emenda de Bancada", "bancada",
   tipo_de_emenda == "Emenda de Comissão", "comissão"
 )]
 
 # Agregar valor empenhado por ano, tipo de emenda e município
-dt_emendas <- dt_emendas[, valor_empenhado := sum(valor_empenhado),
+dt_emendas <- dt_emendas[,
+                         valor_empenhado := sum(valor_empenhado),
                          by = .(tipo_de_emenda, id_municipio)]
 ```
 
@@ -420,7 +421,7 @@ str(dt_individual_sem_pix)
 
 ```{r}
 # Filtrar por tipo de emenda
-dt_individual_somente_pix <- dt[tipo_de_emenda == "individual - 'pix'"]
+dt_individual_somente_pix <- dt[tipo_de_emenda == "individual - pix"]
 
 # Checar base de dados
 str(dt_individual_somente_pix)
