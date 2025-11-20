@@ -6,6 +6,7 @@ editor: visual
 ---
 
 -   Diferença em relação à v1: Vou juntar dt_municipios_eleicoes com dt_emendas antes de cada exercício em vez de tentar juntar tudo no começo e ir alterando depois.
+
 -   Diferença em relação à versão de 11.11.2025: Mudei os dados selecionados de características municipais (para serem mais recentes) e a fonte de dados de emendas parlamentares (para que o ano da emenda refletisse seu ano de empenho, não proposição)
 
 # 0) Preparativos
@@ -176,16 +177,30 @@ str(dt_eleicoes)
 
 ## 1.3) Emendas parlamentares
 
--   Origem dos dados: [Portal da Transparência - CGU \> Emendas Parlamentares](https://portaldatransparencia.gov.br/download-de-dados/emendas-parlamentares)
+-   Origem dos dados: [Senado Federal \> Portal do Orçamento \> Siga Brasil \> Painel Emendas](https://www9qs.senado.leg.br/extensions/Siga_Brasil_Emendas/Siga_Brasil_Emendas.html) \> Gráficos customizados
+    -   Variáveis selecionadas:
+        -   Ano Emissão Empenho
+            -   Filtro: "2021"
+        -   Função
+        -   Funcional Localidade
+        -   Funcional Localidade (Região)
+            -   Filtro: "REGIÃO NORDESTE" ou "NE"
+        -   Funcional Localidade (Tipo)
+            -   Filtro: "MUNICÍPIO"
+        -   GND (Desc)
+        -   Empenhado (IPCA)
 
 ```{r}
 # Carregar base de dados de emendas parlamentares
-dt_emendas <- read.csv2("Bases de dados/CGU_emendas_parlamentares.csv", fileEncoding = "Latin1", encoding = "UTF-8")
+dt_emendas <- read_excel("Bases de dados/SigaBrasil_emendas.xlsx")
 setDT(dt_emendas)
 
 # Renomear colunas
 colnames(dt_emendas) <- make_clean_names(colnames(dt_emendas))
-setnames(dt_emendas, "codigo_municipio_ibge", "id_municipio")
+setnames(dt_emendas, "funcional_localidade", "id_municipio_nome")
+
+# Retirar colunas utilizadas somente para filtros
+[]
 
 # Selecionar dados relevantes
 dt_emendas <- dt_emendas[
@@ -215,7 +230,7 @@ dt_emendas <- dt_emendas[,
                          by = .(tipo_de_emenda, id_municipio)]
 ```
 
--   Note que, após filtrar para 2021, região Nordeste e emendas direcionadas a certo município, não restam emendas de relator nem emendas de comissão. Por isso, não as analisaremos na estimação.
+-   Note que, após filtrar para 2021, restaram somente emendas individuais, de bancada e de comissão.
 
 # 2) Estatísticas descritivas
 
@@ -356,65 +371,9 @@ medianas_municipios_eleicoes %>%
 
 # 3) Estimação
 
-Para cada análise (todas as emendas vs. emendas individuais vs. emendas de bancada etc.), vamos juntar as bases de dados (dt_municipios_eleicoes e dt_emendas) e, então, visualizar e estimar o valor adicional recebido via emendas parlamentares pelos municípios em que o candidato a prefeito do PP ganhou por pouco.
+Para cada análise (todas as emendas vs. emendas individuais vs. emendas de comissão vs. emendas de relator), vamos juntar as bases de dados (dt_municipios_eleicoes e dt_emendas) e, então, visualizar e estimar o valor adicional recebido via emendas parlamentares pelos municípios em que o candidato a prefeito do PP ganhou por pouco.
 
-## 3.1) Para todos os tipos de emendas
-
-```{r}
-# Juntar bases de dados
-## Somar todas as emendas por município
-dt_emendas_total <- dt_emendas[,
-                               .(valor_empenhado = sum(valor_empenhado)),
-                               by = id_municipio]
-## Juntar bases de dados
-dt <- merge(dt_municipios_eleicoes, dt_emendas_total, by = "id_municipio", all.x = T)
-## Verificar quantos NAs (municípios sem emendas) houve
-colSums(is.na(dt))
-## Preencher valores NA com 0
-
-
-# Checar base de dados
-str(dt_todas)
-
-# Plotar diferença
-
-# Fazer a estimação
-
-```
-
--   DÚVIDA: 173 de 195 NÃO TEREM RECEBIDO QUALQUER EMENDA PARECE ALTO DEMAIS! CONFERIR COM NOMES DE MUNICÍPIOS, SIGA BRASIL
-
-## 3.2) Para emendas individuais (inclusive Pix)
-
-```{r}
-# Filtrar por tipo de emenda
-# tipo_emenda %in% c("individual - finalidade definida", "individual - 'pix"),
-
-# Checar base de dados
-str(dt_individual_inclusive_pix)
-
-# Plotar diferença
-
-# Fazer a estimação
-
-```
-
-## 3.3) Para emendas individuais (exceto Pix)
-
-```{r}
-# Filtrar por tipo de emenda
-dt_individual_sem_pix <- dt[tipo_de_emenda == "individual - finalidade definida"]
-
-# Checar base de dados
-str(dt_individual_sem_pix)
-
-# Plotar diferença
-
-# Fazer a estimação
-
-```
-
-## 3.4) Para emendas individuais (somente Pix)
+## 3.1) Para emendas individuais
 
 ```{r}
 # Filtrar por tipo de emenda
@@ -429,7 +388,23 @@ str(dt_individual_somente_pix)
 
 ```
 
-## 3.5) Para emendas de bancada
+## 3.2) Para emendas de comissão
+
+```{r}
+# Filtrar por tipo de emenda
+dt_bancada <- dt[tipo_de_emenda == "bancada"]
+dt_bancada <- unique(dt_bancada)
+
+# Checar base de dados
+str(dt_bancada)
+
+# Plotar diferença
+
+# Fazer a estimação
+
+```
+
+## 3.3) Para emendas de relator
 
 ```{r}
 # Filtrar por tipo de emenda
