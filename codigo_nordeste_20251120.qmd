@@ -20,6 +20,8 @@ library(janitor) # para transformação dos dados
 library(ggplot2) # para visualização dos dados
 library(cowplot) # para visualização dos dados (plotá-los lado a lado)
 library(scales) # para visualização dos dados (fazer eixos bonito)
+library(estimatr) # para modelagem
+library(modelsummary) # para visualização de resultados dos modelos
 ```
 
 # 1) Coleta e junção de dados
@@ -46,7 +48,7 @@ library(scales) # para visualização dos dados (fazer eixos bonito)
 
 ```{r}
 # Carregar planilha montada a partir dos relatórios do IBGE Cidades
-dt_municipios <- read_excel("Bases de dados/IBGE_municipios.xlsx")
+dt_municipios <- read_excel("Bases de dados/Nordeste/IBGE_municipios.xlsx")
 setDT(dt_municipios)
 
 # Renomear colunas
@@ -115,11 +117,11 @@ dt_municipios[,
 # rm(query)
 
 # Salvar base de dados resultante
-# saveRDS(dt_eleicoes, "Bases de dados/TSE_eleicoes.rds")
+# saveRDS(dt_eleicoes, "Bases de dados/Nordeste/TSE_eleicoes.rds")
 
 
 # Carregar base de dados de eleições
-dt_eleicoes <- readRDS("Bases de dados/TSE_eleicoes.rds")
+dt_eleicoes <- readRDS("Bases de dados/Nordeste/TSE_eleicoes.rds")
 setDT(dt_eleicoes)
 
 # Retirar primeiro turno dos municípios que tiveram segundo turno
@@ -225,10 +227,10 @@ str(dt_eleicoes)
 # de_para_emendas_municipios <- de_para_emendas_municipios[, .(emenda_numero_ano, id_municipio)]
 # 
 # # Salvar base de dados resultante
-# saveRDS(de_para_emendas_municipios, "Bases de dados/BD_id_emenda_municipio.rds")
+# saveRDS(de_para_emendas_municipios, "Bases de dados/Nordeste/BD_id_emenda_municipio.rds")
 
 # Carregar base de dados que relaciona emendas e municípios (por código do IBGE)
-de_para_emendas_municipios <- readRDS("Bases de dados/BD_id_emenda_municipio.rds")
+de_para_emendas_municipios <- readRDS("Bases de dados/Nordeste/BD_id_emenda_municipio.rds")
 ```
 
 -   Origem dos dados: [Senado Federal \> Portal do Orçamento \> Siga Brasil \> Painel Emendas](https://www9qs.senado.leg.br/extensions/Siga_Brasil_Emendas/Siga_Brasil_Emendas.html) \> Gráficos customizados
@@ -249,7 +251,7 @@ de_para_emendas_municipios <- readRDS("Bases de dados/BD_id_emenda_municipio.rds
 
 ```{r}
 # Carregar base de dados de emendas parlamentares
-dt_emendas <- read_excel("Bases de dados/SigaBrasil_emendas.xlsx")
+dt_emendas <- read_excel("Bases de dados/Nordeste/SigaBrasil_emendas.xlsx")
 setDT(dt_emendas)
 
 # Renomear colunas
@@ -616,7 +618,7 @@ Para mostrar se seria melhor permitir duas funções de cada lado, queria plotar
 Por isso, vamos somente plotar a soma de valores empenhados via para municípios que tiveram eleições acirradas e elegeram ou não o candidato do PP, o que seria equivalente a visualizar o modelo mais simples de RDD.
 
 ```{r}
-# Plotar diferença em valores empenhados pelo prefeito
+# Plotar diferença em valores empenhados pelo resultado da eleição
 plot_grid(
 ggplot() + 
   labs(title = "Comparação do valor empenhado total de emendas parlamentares (EPs)", subtitle = "Fontes dos dados: TSE (2021), SIGA Brasil (2021). Elaboração própria.") + 
@@ -662,19 +664,32 @@ Vamos estimar o valor adicional recebido via emendas parlamentares pelos municí
 ## 3.1) Para todas as emendas
 
 ```{r}
+# Uma regressão linear
+reg_linear <- lm_robust(valor_empenhado_ipca ~ vitoria_pp, data = dt_todas)
+modelsummary(reg_linear)
 
+# Duas regressões lineares
+
+# Duas regressões com linearidade flexibilizada
+
+# Resultados
+modelsummary(reg_linear, regs_lineares, regs_flexiveis)
 ```
 
 ## 3.2) Para emendas individuais
 
 ```{r}
-
+# Uma regressão linear
+reg_linear <- lm_robust(valor_empenhado_ipca ~ vitoria_pp, data = dt_individuais)
+modelsummary(reg_linear)
 ```
 
 ## 3.3) Para emendas de bancada
 
 ```{r}
-
+# Uma regressão linear
+reg_linear <- lm_robust(valor_empenhado_ipca ~ vitoria_pp, data = dt_bancada)
+modelsummary(reg_linear)
 ```
 
 ## 3.3) Para emendas de relator
