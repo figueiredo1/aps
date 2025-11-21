@@ -170,6 +170,12 @@ dt_eleicoes <- dt_eleicoes[
 ]
 setnames(dt_eleicoes, "votos_razao", "votos_razao_pp")
 
+# Criar coluna com razão de votos centralizada
+dt_eleicoes[, votos_razao_pp_centr := votos_razao_pp - 0.5]
+
+# Criar coluna com razão de votos centralizada ao quadrado
+dt_eleicoes[, votos_razao_pp_centr_sq := votos_razao_pp_centr^2]
+
 # Dar uma olhada na base de dados resultante
 str(dt_eleicoes)
 ```
@@ -659,37 +665,44 @@ ncol = 1, rel_heights = c(0.15, 1)
 
 # 3) Estimação
 
-Vamos estimar o valor adicional recebido via emendas parlamentares pelos municípios em que o candidato a prefeito do PP ganhou por pouco, usando três desenhos.
+Vamos estimar o valor adicional recebido via emendas parlamentares pelos municípios em que o candidato a prefeito do PP ganhou por pouco, usando alguns modelos diferentes.
+
+-   Note que, quando o modelo inclui a running variable, é sua versão centralizada (votos_razao_pp_centr), porque isso evita que o intercepto tenha valores sem sentido (como valores empenhados negativos)
 
 ## 3.1) Para todas as emendas
 
 ```{r}
 # Uma regressão linear
 reg_linear <- lm_robust(valor_empenhado_ipca ~ vitoria_pp, data = dt_todas)
-modelsummary(reg_linear)
 
-# Duas regressões lineares
+# Uma regressão linear com controles
+reg_linear_controle <- lm_robust(valor_empenhado_ipca ~ vitoria_pp + votos_razao_pp_centr, data = dt_todas)
+
+# Duas regressões lineares com controles
+regs_lineares_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr, data = dt_todas)
 
 # Duas regressões com linearidade flexibilizada
+regs_flexiveis <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_todas)
 
 # Resultados
-modelsummary(reg_linear, regs_lineares, regs_flexiveis)
+modelsummary(list(
+  "Regressão básica" = reg_linear,
+  "Regressão com controle" = reg_linear_controle,
+  "Duas regressões com controles" = regs_lineares_controles,
+  "Duas regressões com controles e quad" = regs_flexiveis
+))
 ```
 
 ## 3.2) Para emendas individuais
 
 ```{r}
-# Uma regressão linear
-reg_linear <- lm_robust(valor_empenhado_ipca ~ vitoria_pp, data = dt_individuais)
-modelsummary(reg_linear)
+
 ```
 
 ## 3.3) Para emendas de bancada
 
 ```{r}
-# Uma regressão linear
-reg_linear <- lm_robust(valor_empenhado_ipca ~ vitoria_pp, data = dt_bancada)
-modelsummary(reg_linear)
+
 ```
 
 ## 3.3) Para emendas de relator
