@@ -20,9 +20,11 @@ library(janitor) # para transformação dos dados
 library(ggplot2) # para visualização dos dados
 ```
 
-# 1) Coleta de dados
+# 1) Coleta e junção de dados
 
-## 1.1) Características municipais
+## 1.1) Coleta de dados
+
+### 1.1.1) Características municipais
 
 -   Origem dos dados: Acessar [IBGE Cidades](https://cidades.ibge.gov.br/) \> Selecionar UFs do Nordeste \> Selecionar variáveis de interesse
 
@@ -72,7 +74,7 @@ dt_municipios[,
 ]
 ```
 
-## 1.2) Eleições
+### 1.1.2) Eleições
 
 -   Origem dos dados: Acessar [Base dos Dados \> Eleições Brasileiras](https://basedosdados.org/dataset/eef764df-bde8-4905-b115-6fc23b6ba9d6?table=391047eb-b3ef-4141-a4d1-725b29018f25){.uri} \> Resultados por Candidato e Município
 
@@ -182,7 +184,7 @@ str(dt_eleicoes)
 
                         -   Note que quase se atinge os 200 indicados como referência para a lei dos grandes números pela profa. Beti Kira nas aulas de Estatística!
 
-## 1.3) Emendas parlamentares
+### 1.1.3) Emendas parlamentares
 
 -   A base principal virá do Siga Brasil. No entanto, essa base não contém o código IBGE do município favorecido pela emenda. Por isso, vamos começar carregando dados da Base dos Dados (originados nos dados da CGU) que associam o identificador da emenda parlamentar ao município de destinação.
 -   Origem dos dados: [Base dos Dados \> Emendas Parlamentares](https://basedosdados.org/dataset/257e000c-1685-418a-88d9-4908ccef2840?table=f116068d-b65d-4d04-9bcb-368e70062c4b)
@@ -312,11 +314,24 @@ dt_emendas[, tipo_emenda := fcase(
 
 # Dar uma olhada na base
 head(dt_emendas)
+
+# Resumir valor empenhado de emendas por tipo
+dt_emendas[, sum(valor_empenhado_ipca), by = tipo_emenda]
+
+# Resumir qtde de municípios que receberam cada tipo de emenda
+writeLines(paste0(
+  "\nQuantidade de municípios a receberem qualquer tipo de emenda: ", length(dt_emendas[, unique(id_municipio)]),
+  "\nQuantidade de municípios a receberem emendas individuais: ", length(dt_emendas[tipo_emenda == "individual", unique(id_municipio)]),
+  "\nQuantidade de municípios a receberem emendas de bancada: ", length(dt_emendas[tipo_emenda == "bancada", unique(id_municipio)]),
+  "\nQuantidade de municípios a receberem emendas de relator: ", length(dt_emendas[tipo_emenda == "relator", unique(id_municipio)])
+))
 ```
 
 -   Note que 287 municípios nordestinos foram favorecidos por algum empenho de emenda em 2021 e que essas emendas foram somente emendas individuais, de bancada e de relator.
 
-## 1.4) Juntar bases de municípios e eleições
+## 1.2) Junção de dados
+
+### 1.2.1) Juntar bases de municípios e eleições
 
 ```{r}
 # Ver se algum município de dt_eleicoes não está em dt_municípios
@@ -351,15 +366,84 @@ str(dt_municipios_eleicoes)
 
 # Verificar se houve algum NA
 colSums(is.na(dt_municipios_eleicoes))
+
+# Remover dts intermediárias
+rm(dt_eleicoes, dt_municipios)
 ```
 
-## 1.5) Juntar base de municípios e eleições com bases de emendas
+### 1.2.2) Juntar base de municípios e eleições com bases de emendas
 
-### 1.5.1) Para emendas de tipo X
+#### 1.2.2.1) Para emendas de todos os tipos
 
-### 1.5.1) Para emendas de tipo Y
+```{r}
+# Resumir emendas por id_municipio, independentemente de tipo
+dt_emendas_todas <- dt_emendas[,
+                               .(valor_empenhado_ipca = sum(valor_empenhado_ipca)),
+                               by = id_municipio]
 
-### 1.5.1) Para emendas de tipo Z
+# Adicionar dados sobre emendas ao dt_municipios_eleicoes
+dt_todas <- merge(dt_municipios_eleicoes, dt_emendas_todas, all.x = T, by = "id_municipio")
+
+# Ver quantos municípios com eleições acirradas receberam emendas
+writeLines(paste0(
+  "Quantidade de municípios com eleições acirradas que receberam emendas: ",
+  nrow(dt_todas[!is.na(valor_empenhado_ipca)])
+))
+```
+
+#### 1.2.2.2) Para emendas individuais
+
+```{r}
+# Filtrar por somente emendas individuais
+dt_emendas_individuais <- dt_emendas[tipo_emenda == "individual"]
+# Remover coluna de tipo
+dt_emendas_individuais[, tipo_emenda := NULL]
+
+# Adicionar dados sobre emendas ao dt_municipios_eleicoes
+dt_individuais <- merge(dt_municipios_eleicoes, dt_emendas_individuais, all.x = T, by = "id_municipio")
+
+# Ver quantos municípios com eleições acirradas receberam emendas
+writeLines(paste0(
+  "Quantidade de municípios com eleições acirradas que receberam emendas individuais: ",
+  nrow(dt_individuais[!is.na(valor_empenhado_ipca)])
+))
+```
+
+#### 1.2.2.3) Para emendas de bancada
+
+```{r}
+# Filtrar por somente emendas de bancada
+dt_emendas_bancada <- dt_emendas[tipo_emenda == "bancada"]
+# Remover coluna de tipo
+dt_emendas_bancada[, tipo_emenda := NULL]
+
+# Adicionar dados sobre emendas ao dt_municipios_eleicoes
+dt_bancada <- merge(dt_municipios_eleicoes, dt_emendas_bancada, all.x = T, by = "id_municipio")
+
+# Ver quantos municípios com eleições acirradas receberam emendas
+writeLines(paste0(
+  "Quantidade de municípios com eleições acirradas que receberam emendas de bancada: ",
+  nrow(dt_bancada[!is.na(valor_empenhado_ipca)])
+))
+```
+
+#### 1.2.2.4) Para emendas de relator
+
+```{r}
+# Filtrar por somente emendas de relator
+dt_emendas_relator <- dt_emendas[tipo_emenda == "relator"]
+# Remover coluna de tipo
+dt_emendas_relator[, tipo_emenda := NULL]
+
+# Adicionar dados sobre emendas ao dt_municipios_eleicoes
+dt_relator <- merge(dt_municipios_eleicoes, dt_emendas_relator, all.x = T, by = "id_municipio")
+
+# Ver quantos municípios com eleições acirradas receberam emendas
+writeLines(paste0(
+  "Quantidade de municípios com eleições acirradas que receberam emendas de relator: ",
+  nrow(dt_relator[!is.na(valor_empenhado_ipca)])
+))
+```
 
 # 2) Estatísticas descritivas
 
@@ -417,7 +501,7 @@ medias_municipios_eleicoes %>%
 
 ```
 
--   As médias de população e densidade demográfica são bastante diferentes entre os dois grupos. Como elas são correlacionadas, é bastante provável que sejam algumas cidades grandes, outliers, puxando a média dos municípios com vitória do PP. Por isso, vamos usar a medida de mediana, que é menos sensível a valores extremos.
+-   As médias de densidade demográfica são as mais diferentes entre os dois grupos. Vamos olhar para a mediana para evitar o efeito de outliers:
 
 ## 2.2) Comparação de medianas
 
@@ -473,35 +557,13 @@ medianas_municipios_eleicoes %>%
 
 -   De fato, usando a mediana, população e densidade demográfica ficaram mais parecidas. O PIBpc ficou um pouco menos parecido, mas, no todo, parece bastante razoável.
 
-    -   DÚVIDA: COMO PARECE HAVER MUNICÍPIOS OUTLIERS, DEVERÍAMOS TIRÁ-LOS DA AMOSTRA?
-
 # 3) Estimação
 
 Para cada análise (todas as emendas vs. emendas individuais vs. emendas de comissão vs. emendas de relator), vamos juntar as bases de dados (dt_municipios_eleicoes e dt_emendas) e, então, visualizar e estimar o valor adicional recebido via emendas parlamentares pelos municípios em que o candidato a prefeito do PP ganhou por pouco.
 
--   ACHO QUE NÃO VAI PRECISAR DO PROCEDIMENTO ABAIXO. SE NÃO, DELETAR
-
-```{r}
-# Compatibilizar nomes dos municípios de dt_emendas com os de dt_municipios_eleicoes
-
-## Em dt_emendas, remover tudo que vem depois de " - " (geralmente são as siglas das UFs - checar com grepl)
-
-## Em dt_municipios_eleicoes, retirar acentos e afins e passar tudo para maiúsculas (com clear_names)
-
-## Verificar municípios sem match nas emendas parlamentares entre as bases de dados (só olhar pros 195 de dt_municipios_emendas!)
-
-## Em dt_emendas, mudar ortografias divergentes de dt_municipios_eleicoes
-```
-
 ## 3.1) Para emendas individuais
 
 ```{r}
-# Filtrar por tipo de emenda
-dt_individual_somente_pix <- dt[tipo_de_emenda == "individual - pix"]
-
-# Checar base de dados
-str(dt_individual_somente_pix)
-
 # Plotar diferença
 
 # Fazer a estimação
@@ -511,32 +573,12 @@ str(dt_individual_somente_pix)
 ## 3.2) Para emendas de comissão
 
 ```{r}
-# Filtrar por tipo de emenda
-dt_bancada <- dt[tipo_de_emenda == "bancada"]
-dt_bancada <- unique(dt_bancada)
-
-# Checar base de dados
-str(dt_bancada)
-
-# Plotar diferença
-
-# Fazer a estimação
 
 ```
 
 ## 3.3) Para emendas de relator
 
 ```{r}
-# Filtrar por tipo de emenda
-dt_bancada <- dt[tipo_de_emenda == "bancada"]
-dt_bancada <- unique(dt_bancada)
-
-# Checar base de dados
-str(dt_bancada)
-
-# Plotar diferença
-
-# Fazer a estimação
 
 ```
 
