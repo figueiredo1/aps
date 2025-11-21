@@ -18,6 +18,8 @@ library(dplyr) # para transformação dos dados
 library(data.table) # para transformação dos dados
 library(janitor) # para transformação dos dados
 library(ggplot2) # para visualização dos dados
+library(cowplot) # para visualização dos dados (plotá-los lado a lado)
+library(scales) # para visualização dos dados (fazer eixos bonito)
 ```
 
 # 1) Coleta e junção de dados
@@ -389,6 +391,9 @@ writeLines(paste0(
   "Quantidade de municípios com eleições acirradas que receberam emendas: ",
   nrow(dt_todas[!is.na(valor_empenhado_ipca)])
 ))
+
+# Transformar NAs em 0
+dt_todas[is.na(valor_empenhado_ipca), valor_empenhado_ipca := 0]
 ```
 
 #### 1.2.2.2) Para emendas individuais
@@ -407,6 +412,9 @@ writeLines(paste0(
   "Quantidade de municípios com eleições acirradas que receberam emendas individuais: ",
   nrow(dt_individuais[!is.na(valor_empenhado_ipca)])
 ))
+
+# Transformar NAs em 0
+dt_individuais[is.na(valor_empenhado_ipca), valor_empenhado_ipca := 0]
 ```
 
 #### 1.2.2.3) Para emendas de bancada
@@ -425,6 +433,9 @@ writeLines(paste0(
   "Quantidade de municípios com eleições acirradas que receberam emendas de bancada: ",
   nrow(dt_bancada[!is.na(valor_empenhado_ipca)])
 ))
+
+# Transformar NAs em 0
+dt_bancada[is.na(valor_empenhado_ipca), valor_empenhado_ipca := 0]
 ```
 
 #### 1.2.2.4) Para emendas de relator
@@ -443,13 +454,17 @@ writeLines(paste0(
   "Quantidade de municípios com eleições acirradas que receberam emendas de relator: ",
   nrow(dt_relator[!is.na(valor_empenhado_ipca)])
 ))
+
+
+# Transformar NAs em 0
+dt_relator[is.na(valor_empenhado_ipca), valor_empenhado_ipca := 0]
 ```
 
 # 2) Estatísticas descritivas
 
 Agora, vamos mostrar que os municípios em que o candidato do PP ganhou vs. perdeu por pouco de fato são semelhantes.
 
-## 2.1) Comparação de médias
+## 2.1) Comparação de médias das características municipais
 
 ```{r}
 # Criar dt com médias
@@ -467,46 +482,66 @@ medias_municipios_eleicoes <- dt_municipios_eleicoes[
 ]
 
 # Plotar médias de quem venceu vs. não venceu - formatar
-medias_municipios_eleicoes %>%
-  ggplot(aes(y = media_IDHm, x = as.factor(vitoria_pp))) +
-  geom_col() +
-  theme_minimal()
+plot_grid(
+ggplot() + 
+  labs(title = "Comparação das médias de características municipais", subtitle = "Fontes dos dados: TSE, IBGE (2021, 2022). Elaboração própria.") + 
+  theme_minimal(),
 
-medias_municipios_eleicoes %>%
-  ggplot(aes(y = media_PIBpc, x = as.factor(vitoria_pp))) +
-  geom_col() +
-  theme_minimal()
-
-medias_municipios_eleicoes %>%
-  ggplot(aes(y = media_percentual_renda_pc_meio_sm, x = as.factor(vitoria_pp))) +
-  geom_col() +
-  theme_minimal()
-
-medias_municipios_eleicoes %>%
-  ggplot(aes(y = media_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
-  geom_col() +
-  theme_minimal()
-
+plot_grid(
 medias_municipios_eleicoes %>%
   ggplot(aes(y = media_pop, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal()
+  theme_minimal() +
+  labs(title = "",
+       y = "População",
+       x = "Prefeito do PP?"),
 
 medias_municipios_eleicoes %>%
   ggplot(aes(y = media_densidade_demografica, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal()
+  theme_minimal() +
+  labs(title = "",
+       y = "Ðensidade demográfica",
+       x = "Prefeito do PP?"),
 
-# Mostrar quais diferenças são estatisticamente significantes - fazer teste de comparação de médias
+medias_municipios_eleicoes %>%
+  ggplot(aes(y = media_PIBpc, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal() +
+  labs(title = "",
+       y = "PIB per capita",
+       x = "Prefeito do PP?"),
+
+medias_municipios_eleicoes %>%
+  ggplot(aes(y = media_IDHm, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal() +
+  labs(title = "",
+       y = "IDH municipal",
+       x = "Prefeito do PP?"),
+
+medias_municipios_eleicoes %>%
+  ggplot(aes(y = media_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal() +
+  labs(title = "",
+       y = "Taxa de escolarização",
+       x = "Prefeito do PP?")
+),
+
+ncol = 1, rel_heights = c(0.15, 1)
+)
+
+# Mostrar quais diferenças são estatisticamente significantes - fazer teste de comparação des
 
 ```
 
 -   As médias de densidade demográfica são as mais diferentes entre os dois grupos. Vamos olhar para a mediana para evitar o efeito de outliers:
 
-## 2.2) Comparação de medianas
+## 2.2) Comparação de medianas das características municipais
 
 ```{r}
-# Criar dt com médias
+# Criar dt com medianas
 medianas_municipios_eleicoes <- dt_municipios_eleicoes[
   ,
   .(
@@ -520,67 +555,129 @@ medianas_municipios_eleicoes <- dt_municipios_eleicoes[
   by = vitoria_pp
 ]
 
-# Plotar médias de quem venceu vs. não venceu - formatar
-medianas_municipios_eleicoes %>%
-  ggplot(aes(y = mediana_IDHm, x = as.factor(vitoria_pp))) +
-  geom_col() +
-  theme_minimal()
+# Plotar medianas de quem venceu vs. não venceu - formatar
+plot_grid(
+ggplot() + 
+  labs(title = "Comparação das medianas de características municipais", subtitle = "Fontes dos dados: TSE (2021), IBGE (2021, 2022). Elaboração própria.") + 
+  theme_minimal(),
 
-medianas_municipios_eleicoes %>%
-  ggplot(aes(y = mediana_PIBpc, x = as.factor(vitoria_pp))) +
-  geom_col() +
-  theme_minimal()
-
-medianas_municipios_eleicoes %>%
-  ggplot(aes(y = mediana_percentual_renda_pc_meio_sm, x = as.factor(vitoria_pp))) +
-  geom_col() +
-  theme_minimal()
-
-medianas_municipios_eleicoes %>%
-  ggplot(aes(y = mediana_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
-  geom_col() +
-  theme_minimal()
-
+plot_grid(
 medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_pop, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal()
+  theme_minimal() +
+  labs(title = "",
+       y = "População",
+       x = "Prefeito do PP?"),
 
 medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_densidade_demografica, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal()
+  theme_minimal() +
+  labs(title = "",
+       y = "Ðensidade demográfica",
+       x = "Prefeito do PP?"),
 
-# Mostrar quais diferenças são estatisticamente significantes - fazer teste de comparação de médias
+medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_PIBpc, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal() +
+  labs(title = "",
+       y = "PIB per capita",
+       x = "Prefeito do PP?"),
 
+medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_IDHm, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal() +
+  labs(title = "",
+       y = "IDH municipal",
+       x = "Prefeito do PP?"),
+
+medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal() +
+  labs(title = "",
+       y = "Taxa de escolarização",
+       x = "Prefeito do PP?")
+),
+
+ncol = 1, rel_heights = c(0.15, 1)
+)
 ```
 
--   De fato, usando a mediana, população e densidade demográfica ficaram mais parecidas. O PIBpc ficou um pouco menos parecido, mas, no todo, parece bastante razoável.
+-   Usando a mediana, as médias de densidade demográfica ficaram mais parecidas, mas as de PIB *per capita*, um pouco menos.
+
+## 2.3) Valores empenhados via emendas parlamentares
+
+Para mostrar se seria melhor permitir duas funções de cada lado, queria plotar a relação entre o valor empenhado de emendas parlamentares e a razão de votos (considerando somente o top 2) do candidato do PP quando ele esteve entre os 2 candidatos mais votados. No entanto, acho que precisaria ter montado a base de dados incluindo todos os municípios com eleições incluindo o PP, não só os de eleições acirradas. Daria para voltar e fazer isso, mas teria que checar mais questões de compatibilidade entre bases (exs.: ausência de municípios em uma base, diferenças de ortografia etc.).
+
+Por isso, vamos somente plotar a soma de valores empenhados via para municípios que tiveram eleições acirradas e elegeram ou não o candidato do PP, o que seria equivalente a visualizar o modelo mais simples de RDD.
+
+```{r}
+# Plotar diferença em valores empenhados pelo prefeito
+plot_grid(
+ggplot() + 
+  labs(title = "Comparação do valor empenhado total de emendas parlamentares (EPs)", subtitle = "Fontes dos dados: TSE (2021), SIGA Brasil (2021). Elaboração própria.") + 
+  theme_minimal(),
+
+plot_grid(
+dt_todas %>%
+  ggplot(aes(y = valor_empenhado_ipca, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  scale_y_continuous(labels = label_currency(prefix = "R$ ", suffix = " MM", scale = 1/1000000)) +
+  theme_minimal() +
+  labs(title = "",
+       y = "Todas as EPs",
+       x = "Prefeito do PP?"),
+
+dt_individuais %>%
+  ggplot(aes(y = valor_empenhado_ipca, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  scale_y_continuous(labels = label_currency(prefix = "R$ ", suffix = " MM", scale = 1/1000000)) +
+  theme_minimal() +
+  labs(title = "",
+       y = "EPs individuais",
+       x = "Prefeito do PP?"),
+
+dt_bancada %>%
+  ggplot(aes(y = valor_empenhado_ipca, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  scale_y_continuous(labels = label_currency(prefix = "R$ ", suffix = " MM", scale = 1/1000000)) +
+  theme_minimal() +
+  labs(title = "",
+       y = "EPs de bancada",
+       x = "Prefeito do PP?")
+),
+
+ncol = 1, rel_heights = c(0.15, 1)
+)
+```
 
 # 3) Estimação
 
-Para cada análise (todas as emendas vs. emendas individuais vs. emendas de comissão vs. emendas de relator), vamos juntar as bases de dados (dt_municipios_eleicoes e dt_emendas) e, então, visualizar e estimar o valor adicional recebido via emendas parlamentares pelos municípios em que o candidato a prefeito do PP ganhou por pouco.
+Vamos estimar o valor adicional recebido via emendas parlamentares pelos municípios em que o candidato a prefeito do PP ganhou por pouco, usando três desenhos.
 
-## 3.1) Para emendas individuais
+## 3.1) Para todas as emendas
 
 ```{r}
-# Plotar diferença
-
-# Fazer a estimação
 
 ```
 
-## 3.2) Para emendas de comissão
+## 3.2) Para emendas individuais
+
+```{r}
+
+```
+
+## 3.3) Para emendas de bancada
 
 ```{r}
 
 ```
 
 ## 3.3) Para emendas de relator
-
-```{r}
-
-```
 
 # 4) Teste de robustez
 
