@@ -689,21 +689,13 @@ modelsummary(list(
   "Regressão básica" = reg_linear,
   "Regressão com controle" = reg_linear_controle,
   "Duas regressões com controles" = regs_lineares_controles,
-  "Duas regressões com controles e quad" = regs_flexiveis
+  "Duas regressões com controles e termo quadrático" = regs_flexiveis
 ))
 ```
 
 ## 3.2) Para emendas individuais
 
-```{r}
-
-```
-
 ## 3.3) Para emendas de bancada
-
-```{r}
-
-```
 
 ## 3.3) Para emendas de relator
 
