@@ -119,9 +119,14 @@ dt_eleicoes <- readRDS("Bases de dados/TSE_eleicoes.rds")
 setDT(dt_eleicoes)
 
 # Retirar primeiro turno dos municípios que tiveram segundo turno
+# municipios_com_segundo_turno <- dt_eleicoes[turno == 2, unique(id_municipio)]
+# dt_eleicoes <- dt_eleicoes[!(turno == 1 &
+#                                id_municipio %in% municipios_com_segundo_turno)]
+# rm(municipios_com_segundo_turno)
+
+# Retirar município que tiveram segundo turno (como feito pelo Naércio)
 municipios_com_segundo_turno <- dt_eleicoes[turno == 2, unique(id_municipio)]
-dt_eleicoes <- dt_eleicoes[!(turno == 1 &
-                               id_municipio %in% municipios_com_segundo_turno)]
+dt_eleicoes <- dt_eleicoes[!(id_municipio %in% municipios_com_segundo_turno)]
 rm(municipios_com_segundo_turno)
 
 # Selecionar os dois candidatos mais votados
@@ -169,11 +174,13 @@ str(dt_eleicoes)
 
         -   1792 (99,9%) deles tiveram eleições municipais (Fernando de Noronha e \_\_\_\_\_\_, não)
 
-            -   477 (26,6%) deles tiveram um candidato do PP entre os dois candidatos mais votados
+            -   1779 (99,2%) deles não tiveram segundo turno nas eleições municipais
 
-                -   195 (40,6%) desses tiveram uma eleição acirrada (isto é, seu candidato eleito teve no máximo 55% dos votos)
+                -   476 (26%) deles tiveram um candidato do PP entre os dois candidatos mais votados
 
-                    -   Note que quase se atinge os 200 indicados como referência para a lei dos grandes números pela profa. Beti Kira nas aulas de Estatística!
+                    -   194 (41%) deles tiveram uma eleição acirrada (isto é, seu candidato eleito teve no máximo 55% dos votos)
+
+                        -   Note que quase se atinge os 200 indicados como referência para a lei dos grandes números pela profa. Beti Kira nas aulas de Estatística!
 
 ## 1.3) Emendas parlamentares
 
@@ -326,9 +333,23 @@ rm(municipios_dt_eleicoes, municipios_dt_municipios, muni)
 dt_municipios[id_municipio_nome == "Santa Terezinha" & sigla_uf == "BA",
               id_municipio_nome := "Santa Teresinha"]
 
+# Repetir procedimento para ver se deu certo
+municipios_dt_eleicoes <- unique(dt_eleicoes[, paste0(id_municipio_nome, sigla_uf)])
+municipios_dt_municipios <- unique(dt_municipios[, paste0(id_municipio_nome, sigla_uf)])
+for (muni in municipios_dt_eleicoes) {
+  if (!muni %in% municipios_dt_municipios) {
+    print(muni)
+  }
+}
+rm(municipios_dt_eleicoes, municipios_dt_municipios, muni)
+
 # Adicionar dados sobre os municípios com eleições de interesse
 dt_municipios_eleicoes <- merge(dt_eleicoes, dt_municipios, all.x = T)
-## Verificar se houve algum NA
+
+# Dar uma olhada na base de dados resultante
+str(dt_municipios_eleicoes)
+
+# Verificar se houve algum NA
 colSums(is.na(dt_municipios_eleicoes))
 ```
 
