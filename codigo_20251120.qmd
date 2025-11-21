@@ -177,17 +177,63 @@ str(dt_eleicoes)
 
 ## 1.3) Emendas parlamentares
 
+-   A base principal virá do Siga Brasil. No entanto, essa base não contém o código IBGE do município favorecido pela emenda. Por isso, vamos começar carregando dados da Base dos Dados (originados nos dados da CGU) que associam o identificador da emenda parlamentar ao município de destinação.
+-   Origem dos dados: [Base dos Dados \> Emendas Parlamentares](https://basedosdados.org/dataset/257e000c-1685-418a-88d9-4908ccef2840?table=f116068d-b65d-4d04-9bcb-368e70062c4b)
+    -   Variáveis selecionadas:
+        -   ano_emenda
+            -   Filtro: "2021"
+                -   Apesar de essa variável representar o ano em que a emenda foi proposta, não o ano do empenho, o Siga Brasil mostra que todas as 1183 emendas destinadas a municípios com empenho em 2021 foram propostas em 2021.
+        -   id_emenda
+        -   numero_emenda
+        -   id_municipio_gasto
+
+```{r}
+# # Fazer query
+# query <- "
+# SELECT
+#     dados.id_emenda as id_emenda,
+#     dados.ano_emenda as ano_emenda,
+#     dados.id_autor_emenda as id_autor_emenda,
+#     dados.numero_emenda as numero_emenda,
+#     dados.id_municipio_gasto as id_municipio
+# FROM `basedosdados.br_cgu_emendas_parlamentares.microdados` AS dados
+# WHERE 
+#     dados.ano_emenda IN (2021)
+# "
+# de_para_emendas_municipios <- read_sql(query, billing_project_id = "pub-450900")
+# setDT(de_para_emendas_municipios)
+# rm(query)
+# 
+# # Criar emenda (número/ano) igual à base de emendas do Siga Brasil
+# de_para_emendas_municipios[, emenda_numero_ano := paste0(id_autor_emenda,
+#                                                          numero_emenda,
+#                                                          "-",
+#                                                          ano_emenda)]
+# 
+# # Selecionar somente as colunas de de-para
+# de_para_emendas_municipios <- de_para_emendas_municipios[, .(emenda_numero_ano, id_municipio)]
+# 
+# # Salvar base de dados resultante
+# saveRDS(de_para_emendas_municipios, "Bases de dados/BD_id_emenda_municipio.rds")
+
+# Carregar base de dados que relaciona emendas e municípios (por código do IBGE)
+de_para_emendas_municipios <- readRDS("Bases de dados/BD_id_emenda_municipio.rds")
+```
+
 -   Origem dos dados: [Senado Federal \> Portal do Orçamento \> Siga Brasil \> Painel Emendas](https://www9qs.senado.leg.br/extensions/Siga_Brasil_Emendas/Siga_Brasil_Emendas.html) \> Gráficos customizados
     -   Variáveis selecionadas:
-        -   Ano Emissão Empenho
+        -   Autor (Tipo)
+        -   Emenda (Número-Ano)
+        -   Empenho (Ano)
             -   Filtro: "2021"
-        -   Função
-        -   Funcional Localidade
+        -   Função (Desc)
+        -   Funcional Localidade (Desc)
         -   Funcional Localidade (Região)
             -   Filtro: "REGIÃO NORDESTE" ou "NE"
         -   Funcional Localidade (Tipo)
             -   Filtro: "MUNICÍPIO"
         -   GND (Desc)
+            -   Isso é o Grupo de Natureza da Despesa (para esse filtro, Investimentos ou Outras Despesas Correntes)
         -   Empenhado (IPCA)
 
 ```{r}
@@ -197,44 +243,73 @@ setDT(dt_emendas)
 
 # Renomear colunas
 colnames(dt_emendas) <- make_clean_names(colnames(dt_emendas))
-setnames(dt_emendas, "", "id_municipio_nome")
 
-# Retirar colunas utilizadas somente para filtros
-dt_emendas <- dt_emendas[, .(NOMES DAS COLUNAS)]
+# Juntar com informação de códigos IBGE
+dt_emendas <- merge(dt_emendas, de_para_emendas_municipios, all.x = T)
+rm(de_para_emendas_municipios)
 
-# Selecionar dados relevantes
-dt_emendas <- dt_emendas[
-  ano_da_emenda == 2021 & regiao == "Nordeste" & id_municipio != "Sem informação",
-  .(
-     ano_da_emenda,
-     tipo_de_emenda,
-     id_municipio,
-     valor_empenhado
-  )
+# Substituir id_municipio manualmente para as 8 emendas sem essa informação na base
+## CE
+### Parambu
+dt_emendas[emenda_numero_ano == "27020002-2021", id_municipio := "2310308"]
+
+## PB
+### Campina Grande
+dt_emendas[emenda_numero_ano == "37390008-2021", id_municipio := "2504009"]
+dt_emendas[emenda_numero_ano == "71160005-2021", id_municipio := "2504009"]
+### João Pessoa
+dt_emendas[emenda_numero_ano == "24490006-2021", id_municipio := "2507507"]
+
+## PI
+### Teresina
+dt_emendas[emenda_numero_ano == "71190003-2021", id_municipio := "2211001"]
+### Conceição do Canindé
+dt_emendas[emenda_numero_ano == "71190004-2021", id_municipio := "2202802"]
+
+## MA
+### Matões do Norte
+dt_emendas[emenda_numero_ano == "81000652-2021", id_municipio := "2106631"]
+## Timon
+dt_emendas[emenda_numero_ano == "81000739-2021", id_municipio := "2112209"]
+
+# Garantir que não há NAs
+colSums(is.na(dt_emendas))
+
+# Renomear coluna de tipo
+setnames(dt_emendas, "autor_tipo", "tipo_emenda")
+
+# Resumir dados por município, tipo de emenda, função e GND e armazenar dt para eventuais análises de heterogeneidade
+dt_emendas_com_funcao_gnd <- dt_emendas[,
+  .(valor_empenhado_ipca = sum(empenhado_ipca)),
+  by = .(id_municipio, tipo_emenda, funcao, gnd_desc)
 ]
 
-# Ver quais tipos de emendas restam
-dt_emendas[, unique(tipo_de_emenda)]
+# Resumir dados por município e tipo de emenda
+dt_emendas <- dt_emendas[,
+  .(valor_empenhado_ipca = sum(empenhado_ipca)),
+  by = .(id_municipio, tipo_emenda)
+]
+
+# Ver quantos municípios foram favorecidos por algum empenho de emenda em 2021
+length(dt_emendas[, unique(id_municipio)])
+
+# Ver quais tipos de emendas há na base
+dt_emendas[, unique(tipo_emenda)]
 
 # Simplificar nome do tipo de emenda
-dt_emendas[, tipo_de_emenda := fcase(
-  tipo_de_emenda == "Emenda Individual - Transferências com Finalidade Definida", "individual - finalidade definida",
-  tipo_de_emenda == "Emenda Individual - Transferências Especiais", "individual - pix",
-  tipo_de_emenda == "Emenda de Bancada", "bancada",
-  tipo_de_emenda == "Emenda de Comissão", "comissão"
+dt_emendas[, tipo_emenda := fcase(
+  tipo_emenda == "INDIVIDUAL", "individual",
+  tipo_emenda == "BANCADA ESTADUAL (RP 7)", "bancada",
+  tipo_emenda == "RELATOR (RP 9)", "relator"
 )]
 
-# Agregar valor empenhado por ano, tipo de emenda e município
-dt_emendas <- dt_emendas[,
-                         valor_empenhado := sum(valor_empenhado),
-                         by = .(tipo_de_emenda, id_municipio)]
+# Dar uma olhada na base
+head(dt_emendas)
 ```
 
--   Note que, após filtrar para 2021, restaram somente emendas individuais, de bancada e de comissão.
+-   Note que 287 municípios nordestinos foram favorecidos por algum empenho de emenda em 2021 e que essas emendas foram somente emendas individuais, de bancada e de relator.
 
-# 2) Estatísticas descritivas
-
-## 2.1) Juntar bases de municípios e eleições
+## 1.4) Juntar bases de municípios e eleições
 
 ```{r}
 # Ver se algum município de dt_eleicoes não está em dt_municípios
@@ -256,6 +331,16 @@ dt_municipios_eleicoes <- merge(dt_eleicoes, dt_municipios, all.x = T)
 ## Verificar se houve algum NA
 colSums(is.na(dt_municipios_eleicoes))
 ```
+
+## 1.5) Juntar base de municípios e eleições com bases de emendas
+
+### 1.5.1) Para emendas de tipo X
+
+### 1.5.1) Para emendas de tipo Y
+
+### 1.5.1) Para emendas de tipo Z
+
+# 2) Estatísticas descritivas
 
 Agora, vamos mostrar que os municípios em que o candidato do PP ganhou vs. perdeu por pouco de fato são semelhantes.
 
@@ -372,6 +457,20 @@ medianas_municipios_eleicoes %>%
 # 3) Estimação
 
 Para cada análise (todas as emendas vs. emendas individuais vs. emendas de comissão vs. emendas de relator), vamos juntar as bases de dados (dt_municipios_eleicoes e dt_emendas) e, então, visualizar e estimar o valor adicional recebido via emendas parlamentares pelos municípios em que o candidato a prefeito do PP ganhou por pouco.
+
+-   ACHO QUE NÃO VAI PRECISAR DO PROCEDIMENTO ABAIXO. SE NÃO, DELETAR
+
+```{r}
+# Compatibilizar nomes dos municípios de dt_emendas com os de dt_municipios_eleicoes
+
+## Em dt_emendas, remover tudo que vem depois de " - " (geralmente são as siglas das UFs - checar com grepl)
+
+## Em dt_municipios_eleicoes, retirar acentos e afins e passar tudo para maiúsculas (com clear_names)
+
+## Verificar municípios sem match nas emendas parlamentares entre as bases de dados (só olhar pros 195 de dt_municipios_emendas!)
+
+## Em dt_emendas, mudar ortografias divergentes de dt_municipios_eleicoes
+```
 
 ## 3.1) Para emendas individuais
 
