@@ -30,9 +30,9 @@ library(modelsummary) # para visualização de resultados dos modelos
 
 ### 1.1.1) Características municipais
 
--   Origem dos dados: Acessar [IBGE Cidades](https://cidades.ibge.gov.br/) \> Selecionar UFs do Nordeste \> Selecionar variáveis de interesse
+-   Origem dos dados: Acessar [IBGE Cidades](https://cidades.ibge.gov.br/) \> Selecionar UFs \> Selecionar variáveis de interesse
 
-    -   Hipótese: Perfil municipal não mudou significativamente entre os anos de coleta dos dados (2021, 2022) e o ano da eleição (2021)
+    -   Hipótese: Perfil municipal não mudou significativamente entre os anos de coleta dos dados (2021, 2022) e o ano da eleição (2020) e do empenho das emendas (2021)
 
     -   Variáveis selecionadas:
 
@@ -48,11 +48,11 @@ library(modelsummary) # para visualização de resultados dos modelos
 
 ```{r}
 # Carregar planilha montada a partir dos relatórios do IBGE Cidades
-dt_municipios <- read_excel("Bases de dados/Nordeste/IBGE_municipios.xlsx")
+dt_municipios <- read_excel("Bases de dados/Brasil/IBGE_municipios.xlsx")
 setDT(dt_municipios)
 
 # Renomear colunas
-nomes <- c("id_municipio_nome", "sigla_uf", "IDHm", "PIBpc", "percentual_renda_pc_meio_sm", "taxa_escolarizacao", "pop", "densidade_demografica")
+nomes <- c("id_municipio_nome", "sigla_uf", "mortalidade_infantil", "PIBpc", "taxa_escolarizacao", "pop", "densidade_demografica")
 colnames(dt_municipios) <- nomes
 rm(nomes)
 
@@ -69,11 +69,16 @@ dt_municipios[, sigla_uf := fcase(
   sigla_uf == "sergipano ou sergipense", "SE"
 )]
 
-# Transformar pop e densidade demográfica em variáveis numéricas
+# Transformar pop, densidade_demografica, taxa_escolarizacao, mortalidade_infantil em variáveis numéricas
 dt_municipios[, pop := gsub("[^0-9.-]", "", pop) %>% as.numeric()]
 dt_municipios[,
   densidade_demografica := as.numeric(
     gsub(",", ".", gsub("[^0-9,]", "", densidade_demografica))
+  )
+]
+dt_municipios[,
+  mortalidade_infantil := as.numeric(
+    gsub(",", ".", gsub("[^0-9,]", "", mortalidade_infantil))
   )
 ]
 ```
@@ -117,11 +122,11 @@ dt_municipios[,
 # rm(query)
 
 # Salvar base de dados resultante
-# saveRDS(dt_eleicoes, "Bases de dados/Nordeste/TSE_eleicoes.rds")
+# saveRDS(dt_eleicoes, "Bases de dados/Brasil/TSE_eleicoes.rds")
 
 
 # Carregar base de dados de eleições
-dt_eleicoes <- readRDS("Bases de dados/Nordeste/TSE_eleicoes.rds")
+dt_eleicoes <- readRDS("Bases de dados/Brasil/TSE_eleicoes.rds")
 setDT(dt_eleicoes)
 
 # Retirar primeiro turno dos municípios que tiveram segundo turno
@@ -233,10 +238,10 @@ str(dt_eleicoes)
 # de_para_emendas_municipios <- de_para_emendas_municipios[, .(emenda_numero_ano, id_municipio)]
 # 
 # # Salvar base de dados resultante
-# saveRDS(de_para_emendas_municipios, "Bases de dados/Nordeste/BD_id_emenda_municipio.rds")
+# saveRDS(de_para_emendas_municipios, "Bases de dados/Brasil/BD_id_emenda_municipio.rds")
 
 # Carregar base de dados que relaciona emendas e municípios (por código do IBGE)
-de_para_emendas_municipios <- readRDS("Bases de dados/Nordeste/BD_id_emenda_municipio.rds")
+de_para_emendas_municipios <- readRDS("Bases de dados/Brasil/BD_id_emenda_municipio.rds")
 ```
 
 -   Origem dos dados: [Senado Federal \> Portal do Orçamento \> Siga Brasil \> Painel Emendas](https://www9qs.senado.leg.br/extensions/Siga_Brasil_Emendas/Siga_Brasil_Emendas.html) \> Gráficos customizados
@@ -257,7 +262,7 @@ de_para_emendas_municipios <- readRDS("Bases de dados/Nordeste/BD_id_emenda_muni
 
 ```{r}
 # Carregar base de dados de emendas parlamentares
-dt_emendas <- read_excel("Bases de dados/Nordeste/SigaBrasil_emendas.xlsx")
+dt_emendas <- read_excel("Bases de dados/Brasil/SigaBrasil_emendas.xlsx")
 setDT(dt_emendas)
 
 # Renomear colunas
