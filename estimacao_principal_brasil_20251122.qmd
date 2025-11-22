@@ -23,6 +23,7 @@ warning: false
 # 0) Preparativos
 
 ```{r}
+# Instalar pacotes
 library(readxl) # para obtenção dos dados
 library(basedosdados) # para obtenção dos dados
 library(dplyr) # para transformação dos dados
@@ -33,6 +34,10 @@ library(cowplot) # para visualização dos dados (plotá-los lado a lado)
 library(scales) # para visualização dos dados (fazer eixos bonito)
 library(estimatr) # para modelagem
 library(modelsummary) # para visualização de resultados dos modelos
+library(extrafont) # para usar fonte do LaTeX
+
+# Carregar fonte Computer Modern
+
 ```
 
 # 1) Coleta e junção de dados
@@ -521,49 +526,57 @@ Note que filtramos os municípios para os percentis 2 a 99 de cada característi
 ```{r}
 #| label: grafico_caracteristicas_municipais_por_razao_votos_pp
 
-dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = pop)) +
-  geom_point(shape = 21) +
-  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
+g_pop <- dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = pop, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, size = 0.5, color = "black") +
+  stat_smooth(method = "lm", se = F) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() +
+  theme_minimal() + guides(color = "none") +
   labs(title = "",
        y = "População",
        x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
 
-dt_todas[densidade_demografica %between% quantile(densidade_demografica, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = densidade_demografica)) +
-  geom_point(shape = 21) +
-  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
+g_densidade_demografica <- dt_todas[densidade_demografica %between% quantile(densidade_demografica, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = densidade_demografica, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, size = 0.5, color = "black") +
+  stat_smooth(method = "lm", se = F) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() +
+  theme_minimal() + guides(color = "none") +
   labs(title = "",
-       y = "Densidade demográfica",
+       y = "Densidade\ndemográfica",
        x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
 
-dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = PIBpc)) +
-  geom_point(shape = 21) +
-  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
+g_PIBpc <- dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = PIBpc, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, size = 0.5, color = "black") +
+  stat_smooth(method = "lm", se = F) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() +
+  theme_minimal() + guides(color = "none") +
   labs(title = "",
        y = "PIB per capita",
        x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
 
-dt_todas[taxa_escolarizacao %between% quantile(taxa_escolarizacao, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = taxa_escolarizacao)) +
-  geom_point(shape = 21) +
-  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
+g_taxa_escolarizacao <- dt_todas[taxa_escolarizacao %between% quantile(taxa_escolarizacao, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = taxa_escolarizacao, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, size = 0.5, color = "black") +
+  stat_smooth(method = "lm", se = F) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() +
+  theme_minimal() + guides(color = "none") +
   labs(title = "",
-       y = "Taxa de escolarização",
+       y = "Taxa de\nescolarização",
        x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
+
+plot_grid(g_pop, g_densidade_demografica, g_PIBpc, g_taxa_escolarizacao, ncol = 2)
+
+ggsave("Graficos/ContinuidadeCaracteristicas.png", width = 10, height = 7, bg = "white")
 ```
 
 ### 2.2.1) Valor empenhado *per capita* de emendas parlamentares
@@ -571,26 +584,15 @@ dt_todas[taxa_escolarizacao %between% quantile(taxa_escolarizacao, c(.02, .99), 
 ```{r}
 #| label: grafico_valor_empenhado_por_razao_votos_pp
 
-dt_todas[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_pc, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = valor_empenhado_ipca_pc)) +
-  geom_point(shape = 21) +
-  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
-  scale_y_continuous(labels = label_number()) +
-  theme_minimal() +
-  labs(title = "",
-       y = "Valor empenhado per capita - Todas as EPs",
-       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
-
 dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_pc, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = valor_empenhado_ipca_pc)) +
-  geom_point(shape = 21) +
-  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
+  ggplot(aes(x = votos_razao_pp, y = valor_empenhado_ipca_pc, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, color = "black") +
+  stat_smooth(method = "lm", se = F) + scale_color_brewer(palette = "Dark2", direction = -1) + scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() +
+  theme_minimal() + guides(color = "none") +
   labs(title = "",
-       y = "Valor empenhado per capita - Todas as EPs",
+       y = "Valor empenhado per capita",
        x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
 ```
 
@@ -655,7 +657,7 @@ titulo <- ggplot() +
 g1 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_pop, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal() +
+  theme_minimal() + guides(color = "none") +
   labs(title = "",
        y = "População",
        x = "Prefeito do PP?")
