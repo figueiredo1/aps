@@ -229,7 +229,8 @@ Políticas Sociais}
   Diferença em relação à versão de 21/11/2025: Filtrei por eleições
   acirradas só mais tarde para poder fazer os gráficos de
   (des)continuidades de características e valor empenhado por razão de
-  votos do candidato a prefeito do PP
+  votos do candidato a prefeito do PP; não analisei as emendas de
+  bancada após constatar que elas são poucas
 \end{itemize}
 
 \section{0) Preparativos}\label{preparativos}
@@ -1311,45 +1312,28 @@ municipais}\label{caracteruxedsticas-municipais-2}
 \subsubsection{2.2.2) Valores empenhados de emendas
 parlamentares}\label{valores-empenhados-de-emendas-parlamentares}
 
-Vamos plotar a média dos valores empenhados per capita dos municípios
-que tiveram eleições acirradas e elegeram ou não o candidato do PP, o
-que seria equivalente a visualizar o modelo mais simples de RDD.
+Vamos calcular a diferença de médias dos valores empenhados per capita
+dos municípios que tiveram eleições acirradas e elegeram ou não o
+candidato do PP, o que seria equivalente a ATT dado homogeneidade dos
+grupos de controle e tratamento.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# Criar dt com média por grupo}
-\NormalTok{media\_empenho\_individuais }\OtherTok{\textless{}{-}}\NormalTok{ dt\_individuais[,}
-\NormalTok{  .(}\AttributeTok{media\_empenho =} \FunctionTok{mean}\NormalTok{(valor\_empenhado\_ipca\_pc)),}
-\NormalTok{  by }\OtherTok{=}\NormalTok{ vitoria\_pp]}
+\NormalTok{medias\_valor\_empenhado\_ipca\_pc }\OtherTok{\textless{}{-}}\NormalTok{ dt\_individuais[, .(}\AttributeTok{media\_empenho =} \FunctionTok{mean}\NormalTok{(valor\_empenhado\_ipca\_pc)), by }\OtherTok{=}\NormalTok{ vitoria\_pp]}
 
-\CommentTok{\# Plotar diferença em valores empenhados pelo resultado da eleição}
-\NormalTok{media\_empenho\_individuais }\SpecialCharTok{\%\textgreater{}\%}
-  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ media\_empenho, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
-  \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_currency}\NormalTok{(}\AttributeTok{prefix =} \StringTok{"R$ "}\NormalTok{)) }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Comparação de médias de valor empenhado per capita municipal"}\NormalTok{,}
-       \AttributeTok{caption =} \StringTok{"Fontes dos dados: TSE (2021), SIGA Brasil (2021)"}\NormalTok{,}
-       \AttributeTok{y =} \StringTok{"EPs individuais"}\NormalTok{,}
-       \AttributeTok{x =} \StringTok{"Prefeito do PP?"}\NormalTok{)}
+\NormalTok{medias\_valor\_empenhado\_ipca\_pc[vitoria\_pp }\SpecialCharTok{==} \DecValTok{1}\NormalTok{, media\_empenho] }\SpecialCharTok{{-}}\NormalTok{ medias\_valor\_empenhado\_ipca\_pc[vitoria\_pp }\SpecialCharTok{==} \DecValTok{0}\NormalTok{, media\_empenho]}
 \end{Highlighting}
 \end{Shaded}
 
-\includegraphics{estimacao_principal_brasil_20251122_files/figure-pdf/grafico_barras_medias_emendas_parlamentares-1.pdf}
-
-\begin{Shaded}
-\begin{Highlighting}[]
-\FunctionTok{rm}\NormalTok{(media\_empenho\_individuais)}
-\end{Highlighting}
-\end{Shaded}
+\begin{verbatim}
+[1] -0.06417101
+\end{verbatim}
 
 \begin{itemize}
+\tightlist
 \item
-  Note que aquelas poucas emendas de bancada distorcem bastante a média
-  do valor empenhado por todas as emendas.
-\item
-  Note que não faz sentido olhar para medianas porque seriam
-  simplesmente 0 para os dois grupos.
+  Perceba que é uma diferença pequena e negativa, o que não corrobora
+  nossa hipótese.
 \end{itemize}
 
 \section{3) Estimação}\label{estimauxe7uxe3o}

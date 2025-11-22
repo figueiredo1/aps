@@ -18,7 +18,7 @@ warning: false
 
 -   Diferença em relação à versão de 15/11/2025: Mudei os dados selecionados de características municipais (para serem mais recentes) e a fonte de dados de emendas parlamentares (para que o ano da emenda refletisse seu ano de empenho, não proposição)
 
--   Diferença em relação à versão de 21/11/2025: Filtrei por eleições acirradas só mais tarde para poder fazer os gráficos de (des)continuidades de características e valor empenhado por razão de votos do candidato a prefeito do PP
+-   Diferença em relação à versão de 21/11/2025: Filtrei por eleições acirradas só mais tarde para poder fazer os gráficos de (des)continuidades de características e valor empenhado por razão de votos do candidato a prefeito do PP; não analisei as emendas de bancada após constatar que elas são poucas
 
 # 0) Preparativos
 
@@ -776,32 +776,17 @@ rm(medianas_municipios_eleicoes, titulo, graficos, g1, g2, g3, g4, g5)
 
 ### 2.2.2) Valores empenhados de emendas parlamentares
 
-Vamos plotar a média dos valores empenhados per capita dos municípios que tiveram eleições acirradas e elegeram ou não o candidato do PP, o que seria equivalente a visualizar o modelo mais simples de RDD.
+Vamos calcular a diferença de médias dos valores empenhados per capita dos municípios que tiveram eleições acirradas e elegeram ou não o candidato do PP, o que seria equivalente a ATT dado homogeneidade dos grupos de controle e tratamento.
 
 ```{r}
 #| label: grafico_barras_medias_emendas_parlamentares
 
-# Criar dt com média por grupo
-media_empenho_individuais <- dt_individuais[,
-  .(media_empenho = mean(valor_empenhado_ipca_pc)),
-  by = vitoria_pp]
+medias_valor_empenhado_ipca_pc <- dt_individuais[, .(media_empenho = mean(valor_empenhado_ipca_pc)), by = vitoria_pp]
 
-# Plotar diferença em valores empenhados pelo resultado da eleição
-media_empenho_individuais %>%
-  ggplot(aes(y = media_empenho, x = as.factor(vitoria_pp))) +
-  geom_col() +
-  scale_y_continuous(labels = label_currency(prefix = "R$ ")) +
-  theme_minimal() +
-  labs(title = "Comparação de médias de valor empenhado per capita municipal",
-       caption = "Fontes dos dados: TSE (2021), SIGA Brasil (2021)",
-       y = "EPs individuais",
-       x = "Prefeito do PP?")
-rm(media_empenho_individuais)
+medias_valor_empenhado_ipca_pc[vitoria_pp == 1, media_empenho] - medias_valor_empenhado_ipca_pc[vitoria_pp == 0, media_empenho]
 ```
 
--   Note que aquelas poucas emendas de bancada distorcem bastante a média do valor empenhado por todas as emendas.
-
--   Note que não faz sentido olhar para medianas porque seriam simplesmente 0 para os dois grupos.
+-   Perceba que é uma diferença pequena e negativa, o que não corrobora nossa hipótese.
 
 # 3) Estimação
 
