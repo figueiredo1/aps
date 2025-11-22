@@ -514,29 +514,106 @@ rm(dt_emendas)
 
 ## 2.1) Verificação de (des)continuidades
 
+Note que filtramos os municípios para os percentis 2 a 99 de cada característica para evitar distorções causadas por outliers.
+
 ### 2.1.1) Características municipais
 
 ```{r}
 #| label: grafico_caracteristicas_municipais_por_razao_votos_pp
 
-dt_todas %>%
+dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
   ggplot(aes(x = votos_razao_pp, y = pop)) +
   geom_point(shape = 21) +
-  geom_vline(xintercept = 0.5) +
+  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
   theme_minimal() +
   labs(title = "",
        y = "População",
-       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)",
-       color = "Partido do candidato eleito")
+       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
+
+dt_todas[densidade_demografica %between% quantile(densidade_demografica, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = densidade_demografica)) +
+  geom_point(shape = 21) +
+  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() +
+  labs(title = "",
+       y = "Densidade demográfica",
+       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
+
+dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = PIBpc)) +
+  geom_point(shape = 21) +
+  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() +
+  labs(title = "",
+       y = "PIB per capita",
+       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
+
+dt_todas[taxa_escolarizacao %between% quantile(taxa_escolarizacao, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = taxa_escolarizacao)) +
+  geom_point(shape = 21) +
+  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() +
+  labs(title = "",
+       y = "Taxa de escolarização",
+       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
 ```
 
-### 2.2.1) Valores empenhados de emendas parlamentares
+### 2.2.1) Valor empenhado *per capita* de emendas parlamentares
 
 ```{r}
 #| label: grafico_valor_empenhado_por_razao_votos_pp
 
+dt_todas[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_pc, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = valor_empenhado_ipca_pc)) +
+  geom_point(shape = 21) +
+  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() +
+  labs(title = "",
+       y = "Valor empenhado per capita - Todas as EPs",
+       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
 
+dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_pc, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = valor_empenhado_ipca_pc)) +
+  geom_point(shape = 21) +
+  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() +
+  labs(title = "",
+       y = "Valor empenhado per capita - Todas as EPs",
+       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
+
+# Bancada fica estranho pq há pouquíssimas emendas
+dt_bancada[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_pc, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = valor_empenhado_ipca_pc)) +
+  geom_point(shape = 21) +
+  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() +
+  labs(title = "",
+       y = "Valor empenhado per capita - EPs individuais",
+       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
+dt_bancada %>%
+  ggplot(aes(x = votos_razao_pp, y = valor_empenhado_ipca_pc)) +
+  geom_point(shape = 21) +
+  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() +
+  labs(title = "",
+       y = "Valor empenhado per capita - EPs individuais",
+       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
 ```
 
 ## 2.2) Comparação entre tratados e controles
@@ -817,4 +894,40 @@ modelsummary(list(
 )
 ```
 
-# 4) Teste placebo
+# 4) Teste de heterogeneidade
+
+Vamos repetir a estimação por região, mas precisamos prestar atenção no número de observações e de tratados.
+
+## 4.1) Norte
+
+```{r}
+
+```
+
+## 4.2) Nordeste
+
+```{r}
+
+```
+
+## 4.3) Sudeste
+
+```{r}
+
+```
+
+## 4.4) Sul
+
+```{r}
+
+```
+
+## 4.5) Centro-Oeste
+
+```{r}
+
+```
+
+# 5) Teste placebo
+
+Não vamos fazer, já que não encontramos efeito. (Se encontramos efeito para certa região, fazer para ela.)
