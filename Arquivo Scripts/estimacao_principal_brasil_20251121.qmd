@@ -444,7 +444,7 @@ dt_todas[, valor_empenhado_ipca_pc := valor_empenhado_ipca/pop]
 # Ver quantos municípios com eleições acirradas receberam emendas
 writeLines(paste0(
   "Quantidade de municípios com eleições acirradas que receberam emendas: ",
-  nrow(dt_todas[!is.na(valor_empenhado_ipca)])
+  nrow(dt_todas[valor_empenhado_ipca != 0])
 ))
 ```
 
@@ -468,7 +468,7 @@ dt_individuais[, valor_empenhado_ipca_pc := valor_empenhado_ipca/pop]
 # Ver quantos municípios com eleições acirradas receberam emendas
 writeLines(paste0(
   "Quantidade de municípios com eleições acirradas que receberam emendas individuais: ",
-  nrow(dt_individuais[!is.na(valor_empenhado_ipca)])
+  nrow(dt_individuais[valor_empenhado_ipca != 0])
 ))
 ```
 
@@ -492,7 +492,7 @@ dt_bancada[, valor_empenhado_ipca_pc := valor_empenhado_ipca/pop]
 # Ver quantos municípios com eleições acirradas receberam emendas
 writeLines(paste0(
   "Quantidade de municípios com eleições acirradas que receberam emendas de bancada: ",
-  nrow(dt_bancada[!is.na(valor_empenhado_ipca)])
+  nrow(dt_bancada[valor_empenhado_ipca != 0])
 ))
 ```
 
@@ -507,17 +507,17 @@ dt_emendas_relator[, tipo_emenda := NULL]
 # Adicionar dados sobre emendas ao dt_municipios_eleicoes
 dt_relator <- merge(dt_municipios_eleicoes, dt_emendas_relator, all.x = T, by = "id_municipio")
 
+# Transformar NAs em 0
+dt_relator[is.na(valor_empenhado_ipca), valor_empenhado_ipca := 0]
+
 # Adicionar coluna de valor empenhado per capita (usando valor de 2021 e pop de 2022)
 dt_relator[, valor_empenhado_ipca_pc := valor_empenhado_ipca/pop]
 
 # Ver quantos municípios com eleições acirradas receberam emendas
 writeLines(paste0(
   "Quantidade de municípios com eleições acirradas que receberam emendas de relator: ",
-  nrow(dt_relator[!is.na(valor_empenhado_ipca)])
+  nrow(dt_relator[valor_empenhado_ipca != 0])
 ))
-
-# Transformar NAs em 0
-dt_relator[is.na(valor_empenhado_ipca), valor_empenhado_ipca := 0]
 ```
 
 -   Note que nenhum município com eleições acirradas recebeu emendas de relator, então vamos analisar somente emendas individuais e de bancada.
@@ -590,7 +590,7 @@ g5 <- medias_municipios_eleicoes %>%
 graficos <- plot_grid(g1, g2, g3, g4, g5)
 
 plot_grid(titulo, graficos, ncol = 1, rel_heights = c(0.15, 1))
-
+rm(medias_municipios_eleicoes, titulo, graficos, g1, g2, g3, g4, g5)
 
 # Mostrar quais diferenças são estatisticamente significantes - fazer teste de comparação des
 
@@ -662,6 +662,7 @@ g5 <- medianas_municipios_eleicoes %>%
 graficos <- plot_grid(g1, g2, g3, g4, g5)
 
 plot_grid(titulo, graficos, ncol = 1, rel_heights = c(0.15, 1))
+rm(medianas_municipios_eleicoes, titulo, graficos, g1, g2, g3, g4, g5)
 ```
 
 -   Usando a mediana, as médias de população e densidade demográfica ficaram bem mais parecidas, mas as de mortalidade infantil, um pouco menos.
@@ -723,6 +724,7 @@ g3 <- media_empenho_bancada %>%
 graficos <- plot_grid(g1, g2, g3)
 
 plot_grid(titulo, graficos, ncol = 1, rel_heights = c(0.15, 1))
+rm(media_empeho_total, media_empeho_individuais, media_empeho_bancada, titulo, graficos, g1, g2, g3)
 ```
 
 # 3) Estimação
