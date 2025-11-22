@@ -142,6 +142,9 @@
 \NewTableCommand{\tinytableDefineColor}[3]{\definecolor{#1}{#2}{#3}}
 \newcommand{\tinytableTabularrayUnderline}[1]{\underline{#1}}
 \newcommand{\tinytableTabularrayStrikeout}[1]{\sout{#1}}
+\usepackage{fvextra}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+\DefineVerbatimEnvironment{OutputCode}{Verbatim}{breaklines,commandchars=\\\{\}}
 \KOMAoption{captions}{tableheading}
 \makeatletter
 \@ifpackageloaded{caption}{}{\usepackage{caption}}
@@ -203,7 +206,8 @@
   pdfcreator={LaTeX via pandoc}}
 
 
-\title{Trabalho de Avaliação de Políticas Sociais}
+\title{\fontsize{16pt}{18pt}\selectfont Trabalho de Avaliação de
+Políticas Sociais}
 \author{Ana Di Nur, Gabriel Figueiredo, Tiago Brancher}
 \date{}
 
@@ -230,62 +234,8 @@
 \FunctionTok{library}\NormalTok{(readxl) }\CommentTok{\# para obtenção dos dados}
 \FunctionTok{library}\NormalTok{(basedosdados) }\CommentTok{\# para obtenção dos dados}
 \FunctionTok{library}\NormalTok{(dplyr) }\CommentTok{\# para transformação dos dados}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-
-Attaching package: 'dplyr'
-\end{verbatim}
-
-\begin{verbatim}
-The following objects are masked from 'package:stats':
-
-    filter, lag
-\end{verbatim}
-
-\begin{verbatim}
-The following objects are masked from 'package:base':
-
-    intersect, setdiff, setequal, union
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(data.table) }\CommentTok{\# para transformação dos dados}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-
-Attaching package: 'data.table'
-\end{verbatim}
-
-\begin{verbatim}
-The following objects are masked from 'package:dplyr':
-
-    between, first, last
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(janitor) }\CommentTok{\# para transformação dos dados}
-\end{Highlighting}
-\end{Shaded}
-
-\begin{verbatim}
-
-Attaching package: 'janitor'
-\end{verbatim}
-
-\begin{verbatim}
-The following objects are masked from 'package:stats':
-
-    chisq.test, fisher.test
-\end{verbatim}
-
-\begin{Shaded}
-\begin{Highlighting}[]
 \FunctionTok{library}\NormalTok{(ggplot2) }\CommentTok{\# para visualização dos dados}
 \FunctionTok{library}\NormalTok{(cowplot) }\CommentTok{\# para visualização dos dados (plotá{-}los lado a lado)}
 \FunctionTok{library}\NormalTok{(scales) }\CommentTok{\# para visualização dos dados (fazer eixos bonito)}
@@ -293,21 +243,6 @@ The following objects are masked from 'package:stats':
 \FunctionTok{library}\NormalTok{(modelsummary) }\CommentTok{\# para visualização de resultados dos modelos}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{verbatim}
-`modelsummary` 2.0.0 now uses `tinytable` as its default table-drawing
-  backend. Learn more at: https://vincentarelbundock.github.io/tinytable/
-
-Revert to `kableExtra` for one session:
-
-  options(modelsummary_factory_default = 'kableExtra')
-  options(modelsummary_factory_latex = 'kableExtra')
-  options(modelsummary_factory_html = 'kableExtra')
-
-Silence this message forever:
-
-  config_modelsummary(startup_message = FALSE)
-\end{verbatim}
 
 \section{1) Coleta e junção de
 dados}\label{coleta-e-junuxe7uxe3o-de-dados}
@@ -322,27 +257,24 @@ municipais}\label{caracteruxedsticas-municipais}
   Origem dos dados: Acessar \href{https://cidades.ibge.gov.br/}{IBGE
   Cidades} \textgreater{} Selecionar UFs \textgreater{} Selecionar
   variáveis de interesse
+\item
+  Hipótese: Perfil municipal não mudou significativamente entre os anos
+  de coleta dos dados (2021, 2022) e o ano da eleição (2020) e do
+  empenho das emendas (2021)
+\item
+  Variáveis selecionadas:
 
   \begin{itemize}
   \item
-    Hipótese: Perfil municipal não mudou significativamente entre os
-    anos de coleta dos dados (2021, 2022) e o ano da eleição (2020) e do
-    empenho das emendas (2021)
+    População no último censo (2022)
   \item
-    Variáveis selecionadas:
-
-    \begin{itemize}
-    \item
-      População no último censo (2022)
-    \item
-      Densidade demográfica (2022)
-    \item
-      PIB \emph{per capita} municipal (2021)
-    \item
-      Taxa de escolarização de 6 a 14 anos de idade (2022)
-    \item
-      Mortalidade infantil (2023)
-    \end{itemize}
+    Densidade demográfica (2022)
+  \item
+    PIB \emph{per capita} municipal (2021)
+  \item
+    Taxa de escolarização de 6 a 14 anos de idade (2022)
+  \item
+    Mortalidade infantil (2023)
   \end{itemize}
 \end{itemize}
 
@@ -558,10 +490,13 @@ Classes 'data.table' and 'data.frame':  487 obs. of  7 variables:
 
 Note que:
 
-5567 municípios brasileiros tiveram eleições para prefeito em 2020;
-
-1203 (22\% dos 5567) tiveram um candidato do PP entre os dois candidatos
-mais votados;
+\begin{itemize}
+\item
+  5567 municípios brasileiros tiveram eleições para prefeito em 2020;
+\item
+  1203 (22\% dos 5567) tiveram um candidato do PP entre os dois
+  candidatos mais votados;
+\end{itemize}
 
 \begin{itemize}
 \tightlist
@@ -575,7 +510,6 @@ mais votados;
 parlamentares}\label{emendas-parlamentares}
 
 \begin{itemize}
-\tightlist
 \item
   A base principal virá do Siga Brasil. No entanto, essa base não contém
   o código IBGE do município favorecido pela emenda. Por isso, vamos
@@ -586,38 +520,28 @@ parlamentares}\label{emendas-parlamentares}
   Origem dos dados:
   \href{https://basedosdados.org/dataset/257e000c-1685-418a-88d9-4908ccef2840?table=f116068d-b65d-4d04-9bcb-368e70062c4b}{Base
   dos Dados \textgreater{} Emendas Parlamentares}
+\item
+  Variáveis selecionadas:
 
   \begin{itemize}
   \tightlist
   \item
-    Variáveis selecionadas:
+    ano\_emenda
+  \end{itemize}
 
-    \begin{itemize}
-    \tightlist
-    \item
-      ano\_emenda
+  *Filtro: ``2021''. Apesar de essa variável representar o ano em que a
+  emenda foi proposta, não o ano do empenho, o Siga Brasil mostra que
+  todas as 1183 emendas destinadas a municípios com empenho em 2021
+  foram propostas em 2021.
 
-      \begin{itemize}
-      \tightlist
-      \item
-        Filtro: ``2021''
-
-        \begin{itemize}
-        \tightlist
-        \item
-          Apesar de essa variável representar o ano em que a emenda foi
-          proposta, não o ano do empenho, o Siga Brasil mostra que todas
-          as 1183 emendas destinadas a municípios com empenho em 2021
-          foram propostas em 2021.
-        \end{itemize}
-      \end{itemize}
-    \item
-      id\_emenda
-    \item
-      numero\_emenda
-    \item
-      id\_municipio\_gasto
-    \end{itemize}
+  \begin{itemize}
+  \tightlist
+  \item
+    id\_emenda
+  \item
+    numero\_emenda
+  \item
+    id\_municipio\_gasto
   \end{itemize}
 \end{itemize}
 
@@ -657,7 +581,6 @@ parlamentares}\label{emendas-parlamentares}
 \end{Shaded}
 
 \begin{itemize}
-\tightlist
 \item
   Origem dos dados:
   \href{https://www9qs.senado.leg.br/extensions/Siga_Brasil_Emendas/Siga_Brasil_Emendas.html}{Senado
@@ -668,38 +591,34 @@ parlamentares}\label{emendas-parlamentares}
   \tightlist
   \item
     Variáveis selecionadas:
+  \item
+    Autor (Tipo)
+  \item
+    Emenda (Número-Ano)
+  \item
+    Empenho (Ano)
+  \end{itemize}
 
-    \begin{itemize}
-    \tightlist
-    \item
-      Autor (Tipo)
-    \item
-      Emenda (Número-Ano)
-    \item
-      Empenho (Ano)
+  *Filtro: ``2021''
 
-      \begin{itemize}
-      \tightlist
-      \item
-        Filtro: ``2021''
-      \end{itemize}
-    \item
-      Função (Desc)
-    \item
-      Funcional Localidade (Desc)
-    \item
-      Funcional Localidade (Tipo)
+  \begin{itemize}
+  \tightlist
+  \item
+    Função (Desc)
+  \item
+    Funcional Localidade (Desc)
+  \item
+    Funcional Localidade (Tipo)
+  \end{itemize}
 
-      \begin{itemize}
-      \tightlist
-      \item
-        Filtro: ``MUNICÍPIO''
-      \end{itemize}
-    \item
-      GND (Desc)
-    \item
-      Empenhado (IPCA)
-    \end{itemize}
+  *Filtro: ``MUNICÍPIO''
+
+  \begin{itemize}
+  \tightlist
+  \item
+    GND (Desc)
+  \item
+    Empenhado (IPCA)
   \end{itemize}
 \end{itemize}
 
@@ -1202,7 +1121,8 @@ municipais}\label{comparauxe7uxe3o-de-medianas-das-caracteruxedsticas-municipais
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Comparação das medianas de características municipais"}\NormalTok{, }\AttributeTok{subtitle =} \StringTok{"Fontes dos dados: TSE (2021), IBGE (2021, 2022). Elaboração própria."}\NormalTok{) }\SpecialCharTok{+} 
   \FunctionTok{theme\_minimal}\NormalTok{()}
 
-\NormalTok{g1 }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ mediana\_pop, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp)), }\AttributeTok{data =}\NormalTok{ medianas\_municipios\_eleicoes) }\SpecialCharTok{+}
+\NormalTok{g1 }\OtherTok{\textless{}{-}}\NormalTok{ medianas\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ mediana\_pop, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp), }\AttributeTok{data =}\NormalTok{ )) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
   \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
@@ -1367,15 +1287,6 @@ alguns modelos diferentes.
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")
-Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")
-\end{verbatim}
-
 \begin{table}
 \centering
 \begin{tblr}[         %% tabularray outer open
@@ -1456,15 +1367,6 @@ capita}}{3.1.1) Valores per capita}}\label{valores-per-capita}
 \AttributeTok{statistic =} \StringTok{"p.value"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{verbatim}
-Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")
-Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")
-\end{verbatim}
 
 \begin{table}
 \centering
@@ -1549,15 +1451,6 @@ individuais}\label{para-emendas-individuais-1}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")
-Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")
-\end{verbatim}
-
 \begin{table}
 \centering
 \begin{tblr}[         %% tabularray outer open
@@ -1638,15 +1531,6 @@ capita}}{3.2.2) Valores per capita}}\label{valores-per-capita-1}
 \AttributeTok{statistic =} \StringTok{"p.value"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{verbatim}
-Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")
-Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")
-\end{verbatim}
 
 \begin{table}
 \centering
@@ -1731,15 +1615,6 @@ bancada}\label{para-emendas-de-bancada-1}
 \end{Highlighting}
 \end{Shaded}
 
-\begin{verbatim}
-Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")
-Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")
-\end{verbatim}
-
 \begin{table}
 \centering
 \begin{tblr}[         %% tabularray outer open
@@ -1820,15 +1695,6 @@ capita}}{3.3.2) Valores per capita}}\label{valores-per-capita-2}
 \AttributeTok{statistic =} \StringTok{"p.value"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
-
-\begin{verbatim}
-Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")
-Warning in attr(.knitEnv$meta, "knit_meta_id"): 'xfun::attr()' is deprecated.
-Use 'xfun::attr2()' instead.
-See help("Deprecated")
-\end{verbatim}
 
 \begin{table}
 \centering

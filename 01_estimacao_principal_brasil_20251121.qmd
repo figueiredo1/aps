@@ -1,8 +1,17 @@
 ---
-title: "Trabalho de Avaliação de Políticas Sociais"
+title: "\\fontsize{16pt}{18pt}\\selectfont Trabalho de Avaliação de Políticas Sociais"
 author: "Ana Di Nur, Gabriel Figueiredo, Tiago Brancher"
-format: pdf
-editor: visual
+format: 
+  pdf:
+    keep-tex: true
+    include-in-header: 
+       text: |
+         \usepackage{fvextra}
+         \DefineVerbatimEnvironment{Highlighting}{Verbatim}{breaklines,commandchars=\\\{\}}
+         \DefineVerbatimEnvironment{OutputCode}{Verbatim}{breaklines,commandchars=\\\{\}}
+execute:
+  working-directory: here
+warning: false
 ---
 
 -   Diferença em relação à versão de 14/11/2025: Vou juntar dt_municipios_eleicoes com dt_emendas antes de cada exercício em vez de tentar juntar tudo no começo e ir alterando depois.
@@ -32,19 +41,19 @@ library(modelsummary) # para visualização de resultados dos modelos
 
 -   Origem dos dados: Acessar [IBGE Cidades](https://cidades.ibge.gov.br/) \> Selecionar UFs \> Selecionar variáveis de interesse
 
-    -   Hipótese: Perfil municipal não mudou significativamente entre os anos de coleta dos dados (2021, 2022) e o ano da eleição (2020) e do empenho das emendas (2021)
+-   Hipótese: Perfil municipal não mudou significativamente entre os anos de coleta dos dados (2021, 2022) e o ano da eleição (2020) e do empenho das emendas (2021)
 
-    -   Variáveis selecionadas:
+-   Variáveis selecionadas:
 
-        -   População no último censo (2022)
+    -   População no último censo (2022)
 
-        -   Densidade demográfica (2022)
+    -   Densidade demográfica (2022)
 
-        -   PIB *per capita* municipal (2021)
+    -   PIB *per capita* municipal (2021)
 
-        -   Taxa de escolarização de 6 a 14 anos de idade (2022)
+    -   Taxa de escolarização de 6 a 14 anos de idade (2022)
 
-        -   Mortalidade infantil (2023)
+    -   Mortalidade infantil (2023)
 
 ```{r}
 # Carregar planilha montada a partir dos relatórios do IBGE Cidades
@@ -222,23 +231,29 @@ str(dt_eleicoes)
 
 Note que:
 
-5567 municípios brasileiros tiveram eleições para prefeito em 2020;
+-   5567 municípios brasileiros tiveram eleições para prefeito em 2020;
 
-1203 (22% dos 5567) tiveram um candidato do PP entre os dois candidatos mais votados;
+-   1203 (22% dos 5567) tiveram um candidato do PP entre os dois candidatos mais votados;
+
+<!-- -->
 
 -   487 (40% dos 1203 e 9% dos 5567) tiveram uma eleição acirrada (isto é, na qual o candidato eleito teve no máximo 55% da soma dos votos nos dois candidatos mais populares).
 
 ### 1.1.3) Emendas parlamentares
 
 -   A base principal virá do Siga Brasil. No entanto, essa base não contém o código IBGE do município favorecido pela emenda. Por isso, vamos começar carregando dados da Base dos Dados (originados nos dados da CGU) que associam o identificador da emenda parlamentar ao município de destinação.
+
 -   Origem dos dados: [Base dos Dados \> Emendas Parlamentares](https://basedosdados.org/dataset/257e000c-1685-418a-88d9-4908ccef2840?table=f116068d-b65d-4d04-9bcb-368e70062c4b)
-    -   Variáveis selecionadas:
-        -   ano_emenda
-            -   Filtro: "2021"
-                -   Apesar de essa variável representar o ano em que a emenda foi proposta, não o ano do empenho, o Siga Brasil mostra que todas as 1183 emendas destinadas a municípios com empenho em 2021 foram propostas em 2021.
-        -   id_emenda
-        -   numero_emenda
-        -   id_municipio_gasto
+
+-   Variáveis selecionadas:
+
+    -   ano_emenda
+
+    \*Filtro: "2021". Apesar de essa variável representar o ano em que a emenda foi proposta, não o ano do empenho, o Siga Brasil mostra que todas as 1183 emendas destinadas a municípios com empenho em 2021 foram propostas em 2021.
+
+    -   id_emenda
+    -   numero_emenda
+    -   id_municipio_gasto
 
 ```{r}
 # # Fazer query
@@ -274,17 +289,22 @@ de_para_emendas_municipios <- readRDS("Bases de dados/Brasil/BD_id_emenda_munici
 ```
 
 -   Origem dos dados: [Senado Federal \> Portal do Orçamento \> Siga Brasil \> Painel Emendas](https://www9qs.senado.leg.br/extensions/Siga_Brasil_Emendas/Siga_Brasil_Emendas.html) \> Gráficos customizados
+
     -   Variáveis selecionadas:
-        -   Autor (Tipo)
-        -   Emenda (Número-Ano)
-        -   Empenho (Ano)
-            -   Filtro: "2021"
-        -   Função (Desc)
-        -   Funcional Localidade (Desc)
-        -   Funcional Localidade (Tipo)
-            -   Filtro: "MUNICÍPIO"
-        -   GND (Desc)
-        -   Empenhado (IPCA)
+    -   Autor (Tipo)
+    -   Emenda (Número-Ano)
+    -   Empenho (Ano)
+
+    \*Filtro: "2021"
+
+    -   Função (Desc)
+    -   Funcional Localidade (Desc)
+    -   Funcional Localidade (Tipo)
+
+    \*Filtro: "MUNICÍPIO"
+
+    -   GND (Desc)
+    -   Empenhado (IPCA)
 
 ```{r}
 # Carregar base de dados de emendas parlamentares
