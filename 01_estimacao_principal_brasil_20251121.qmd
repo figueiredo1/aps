@@ -735,8 +735,6 @@ Vamos estimar o valor adicional recebido via emendas parlamentares pelos municí
 
 ## 3.1) Para todas as emendas
 
-### 3.1.1) Valores absolutos
-
 ```{r}
 # Duas regressões lineares com controle de razão de votos do PP
 regs_lineares <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr, data = dt_todas)
@@ -745,49 +743,24 @@ regs_lineares <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_cent
 regs_flexiveis <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_todas)
 
 # Duas regressões lineares com controles
-regs_lineares_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_todas)
+regs_lineares_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_todas)
 
 # Duas regressões com linearidade flexibilizada e controles
-regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_todas)
+regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_todas)
 
 # Resultados
 modelsummary(list(
-  "Duas regressões lineares" = regs_lineares,
-  "Duas regressões não lineares" = regs_flexiveis,
-  "Duas regressões lineares com controles" = regs_lineares_controles,
-  "Duas regressões não lineares com controles" = regs_flexiveis_controles
-),
-statistic = "p.value")
-```
-
-### 3.1.1) Valores *per capita*
-
-```{r}
-# Duas regressões lineares com controle de razão de votos do PP
-regs_lineares <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr, data = dt_todas)
-
-# Duas regressões com linearidade flexibilizada e controle de razão de votos do PP
-regs_flexiveis <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_todas)
-
-# Duas regressões lineares com controles
-regs_lineares_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_todas)
-
-# Duas regressões com linearidade flexibilizada e controles
-regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_todas)
-
-# Resultados
-modelsummary(list(
-  "Duas regressões lineares" = regs_lineares,
-  "Duas regressões não lineares" = regs_flexiveis,
-  "Duas regressões lineares com controles" = regs_lineares_controles,
-  "Duas regressões não lineares com controles" = regs_flexiveis_controles
-),
-statistic = "p.value")
+    "Duas regressões lineares" = regs_lineares,
+    "Duas regressões não lineares" = regs_flexiveis,
+    "Duas regressões lineares com controles" = regs_lineares_controles,
+    "Duas regressões não lineares com controles" = regs_flexiveis_controles
+  ),
+  statistic = NULL, stars = T, gof_omit = "R2|AIC|BIC|RMSE",
+  output = "Resultados/ValorEmpenhadoTotal.png"
+  )
 ```
 
 ## 3.2) Para emendas individuais
-
-### 3.2.1) Valores absolutos
 
 ```{r}
 # Duas regressões lineares com controle de razão de votos do PP
@@ -797,49 +770,24 @@ regs_lineares <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_cent
 regs_flexiveis <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_individuais)
 
 # Duas regressões lineares com controles
-regs_lineares_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_individuais)
+regs_lineares_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_individuais)
 
 # Duas regressões com linearidade flexibilizada e controles
-regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_individuais)
+regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_individuais)
 
 # Resultados
 modelsummary(list(
-  "Duas regressões lineares" = regs_lineares,
-  "Duas regressões não lineares" = regs_flexiveis,
-  "Duas regressões lineares com controles" = regs_lineares_controles,
-  "Duas regressões não lineares com controles" = regs_flexiveis_controles
-),
-statistic = "p.value")
-```
-
-### 3.2.2) Valores *per capita*
-
-```{r}
-# Duas regressões lineares com controle de razão de votos do PP
-regs_lineares <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr, data = dt_individuais)
-
-# Duas regressões com linearidade flexibilizada e controle de razão de votos do PP
-regs_flexiveis <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_individuais)
-
-# Duas regressões lineares com controles
-regs_lineares_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_individuais)
-
-# Duas regressões com linearidade flexibilizada e controles
-regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_individuais)
-
-# Resultados
-modelsummary(list(
-  "Duas regressões lineares" = regs_lineares,
-  "Duas regressões não lineares" = regs_flexiveis,
-  "Duas regressões lineares com controles" = regs_lineares_controles,
-  "Duas regressões não lineares com controles" = regs_flexiveis_controles
-),
-statistic = "p.value")
+    "Duas regressões lineares" = regs_lineares,
+    "Duas regressões não lineares" = regs_flexiveis,
+    "Duas regressões lineares com controles" = regs_lineares_controles,
+    "Duas regressões não lineares com controles" = regs_flexiveis_controles
+  ),
+  statistic = NULL, stars = T, gof_omit = "R2|AIC|BIC|RMSE",
+  output = "Resultados/ValorEmpenhadoIndividuais.png"
+)
 ```
 
 ## 3.3) Para emendas de bancada
-
-### 3.3.1) Valores absolutos
 
 ```{r}
 # Duas regressões lineares com controle de razão de votos do PP
@@ -849,42 +797,19 @@ regs_lineares <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_cent
 regs_flexiveis <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_bancada)
 
 # Duas regressões lineares com controles
-regs_lineares_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_bancada)
+regs_lineares_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_bancada)
 
 # Duas regressões com linearidade flexibilizada e controles
-regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_bancada)
+regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_bancada)
 
 # Resultados
 modelsummary(list(
-  "Duas regressões lineares" = regs_lineares,
-  "Duas regressões não lineares" = regs_flexiveis,
-  "Duas regressões lineares com controles" = regs_lineares_controles,
-  "Duas regressões não lineares com controles" = regs_flexiveis_controles
-),
-statistic = "p.value")
-```
-
-### 3.3.2) Valores *per capita*
-
-```{r}
-# Duas regressões lineares com controle de razão de votos do PP
-regs_lineares <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr, data = dt_bancada)
-
-# Duas regressões com linearidade flexibilizada e controle de razão de votos do PP
-regs_flexiveis <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_bancada)
-
-# Duas regressões lineares com controles
-regs_lineares_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_bancada)
-
-# Duas regressões com linearidade flexibilizada e controles
-regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_bancada)
-
-# Resultados
-modelsummary(list(
-  "Duas regressões lineares" = regs_lineares,
-  "Duas regressões não lineares" = regs_flexiveis,
-  "Duas regressões lineares com controles" = regs_lineares_controles,
-  "Duas regressões não lineares com controles" = regs_flexiveis_controles
-),
-statistic = "p.value")
+    "Duas regressões lineares" = regs_lineares,
+    "Duas regressões não lineares" = regs_flexiveis,
+    "Duas regressões lineares com controles" = regs_lineares_controles,
+    "Duas regressões não lineares com controles" = regs_flexiveis_controles
+  ),
+  statistic = NULL, stars = T, gof_omit = "R2|AIC|BIC|RMSE",
+  output = "Resultados/ValorEmpenhadoBancada.png"
+)
 ```
