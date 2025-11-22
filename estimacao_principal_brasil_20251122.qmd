@@ -592,28 +592,6 @@ dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_p
   labs(title = "",
        y = "Valor empenhado per capita - Todas as EPs",
        x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
-
-# Bancada fica estranho pq há pouquíssimas emendas
-dt_bancada[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_pc, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = valor_empenhado_ipca_pc)) +
-  geom_point(shape = 21) +
-  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
-  scale_y_continuous(labels = label_number()) +
-  theme_minimal() +
-  labs(title = "",
-       y = "Valor empenhado per capita - EPs individuais",
-       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
-dt_bancada %>%
-  ggplot(aes(x = votos_razao_pp, y = valor_empenhado_ipca_pc)) +
-  geom_point(shape = 21) +
-  stat_smooth(aes(group = as.factor(vitoria_pp)), method = "loess") +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
-  scale_y_continuous(labels = label_number()) +
-  theme_minimal() +
-  labs(title = "",
-       y = "Valor empenhado per capita - EPs individuais",
-       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
 ```
 
 ## 2.2) Comparação entre tratados e controles
@@ -647,8 +625,7 @@ writeLines(paste0(
   nrow(dt_relator[valor_empenhado_ipca != 0])))
 ```
 
--   Note que nenhum município com eleições acirradas recebeu emendas de relator, então vamos analisar somente emendas individuais e de bancada.
--   Note que pouquíssimos municípios receberam emendas de bancada, então não vamos focar nelas.
+-   Note que nenhum município com eleições acirradas recebeu emendas de relator e somente 5 receberam emendas de bancada, então vamos analisar somente emendas individuais.
 
 ### 2.2.1) Características municipais
 
@@ -804,59 +781,22 @@ Vamos plotar a média dos valores empenhados per capita dos municípios que tive
 ```{r}
 #| label: grafico_barras_medias_emendas_parlamentares
 
-# Criar dts com médias
-media_empenho_total <- dt_todas[
-  ,
+# Criar dt com média por grupo
+media_empenho_individuais <- dt_individuais[,
   .(media_empenho = mean(valor_empenhado_ipca_pc)),
-  by = vitoria_pp
-]
-media_empenho_individuais <- dt_individuais[
-  ,
-  .(media_empenho = mean(valor_empenhado_ipca_pc)),
-  by = vitoria_pp
-]
-media_empenho_bancada <- dt_bancada[
-  ,
-  .(media_empenho = mean(valor_empenhado_ipca_pc)),
-  by = vitoria_pp
-]
+  by = vitoria_pp]
 
 # Plotar diferença em valores empenhados pelo resultado da eleição
-titulo <- ggplot() + 
-  labs(title = "Comparação de médias de valor empenhado per capita municipal", subtitle = "Fontes dos dados: TSE (2021), SIGA Brasil (2021). Elaboração própria.") + 
-  theme_minimal()
-
-g1 <- media_empenho_total %>%
+media_empenho_individuais %>%
   ggplot(aes(y = media_empenho, x = as.factor(vitoria_pp))) +
   geom_col() +
   scale_y_continuous(labels = label_currency(prefix = "R$ ")) +
   theme_minimal() +
-  labs(title = "",
-       y = "Todas as EPs",
-       x = "Prefeito do PP?")
-
-g2 <- media_empenho_individuais %>%
-  ggplot(aes(y = media_empenho, x = as.factor(vitoria_pp))) +
-  geom_col() +
-  scale_y_continuous(labels = label_currency(prefix = "R$ ")) +
-  theme_minimal() +
-  labs(title = "",
+  labs(title = "Comparação de médias de valor empenhado per capita municipal",
+       caption = "Fontes dos dados: TSE (2021), SIGA Brasil (2021)",
        y = "EPs individuais",
        x = "Prefeito do PP?")
-
-g3 <- media_empenho_bancada %>%
-  ggplot(aes(y = media_empenho, x = as.factor(vitoria_pp))) +
-  geom_col() +
-  scale_y_continuous(labels = label_currency(prefix = "R$ ")) +
-  theme_minimal() +
-  labs(title = "",
-       y = "EPs de bancada",
-       x = "Prefeito do PP?")
-
-graficos <- plot_grid(g1, g2, g3)
-
-plot_grid(titulo, graficos, ncol = 1, rel_heights = c(0.15, 1))
-rm(media_empenho_total, media_empenho_individuais, media_empenho_bancada, titulo, graficos, g1, g2, g3)
+rm(media_empenho_individuais)
 ```
 
 -   Note que aquelas poucas emendas de bancada distorcem bastante a média do valor empenhado por todas as emendas.
@@ -865,7 +805,7 @@ rm(media_empenho_total, media_empenho_individuais, media_empenho_bancada, titulo
 
 # 3) Estimação
 
-Vamos estimar o valor adicional recebido via emendas parlamentares **individuais** pelos municípios em que o candidato a prefeito do PP ganhou por pouco, usando alguns modelos diferentes.
+Vamos estimar o valor adicional recebido via emendas parlamentares individuaispelos municípios em que o candidato a prefeito do PP ganhou por pouco, usando alguns modelos diferentes.
 
 -   Note que, quando o modelo inclui a running variable, é sua versão centralizada (votos_razao_pp_centr), porque isso evita que o intercepto tenha valores sem sentido (como valores empenhados negativos).
 
