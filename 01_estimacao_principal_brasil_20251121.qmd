@@ -162,14 +162,9 @@ dt_eleicoes <- readRDS("Bases de dados/Brasil/TSE_eleicoes.rds")
 setDT(dt_eleicoes)
 
 # Retirar primeiro turno dos municípios que tiveram segundo turno
-# municipios_com_segundo_turno <- dt_eleicoes[turno == 2, unique(id_municipio)]
-# dt_eleicoes <- dt_eleicoes[!(turno == 1 &
-#                                id_municipio %in% municipios_com_segundo_turno)]
-# rm(municipios_com_segundo_turno)
-
-# Retirar município que tiveram segundo turno (como feito pelo Naércio)
 municipios_com_segundo_turno <- dt_eleicoes[turno == 2, unique(id_municipio)]
-dt_eleicoes <- dt_eleicoes[!(id_municipio %in% municipios_com_segundo_turno)]
+dt_eleicoes <- dt_eleicoes[!(turno == 1 &
+                               id_municipio %in% municipios_com_segundo_turno)]
 rm(municipios_com_segundo_turno)
 
 # Selecionar os dois candidatos mais votados
@@ -201,8 +196,8 @@ dt_eleicoes <- dt_eleicoes[
     id_municipio,
     id_municipio_nome,
     sigla_uf,
-    votos_razao,
-    vitoria_pp
+    vitoria_pp,
+    votos_razao
   )
 ]
 setnames(dt_eleicoes, "votos_razao", "votos_razao_pp")
@@ -219,17 +214,13 @@ str(dt_eleicoes)
 
 -   Note que:
 
-    -   Há 1794 municípios nordestinos
+    -   5567 municípios brasileiros tiveram eleições para prefeito em 2020
 
-        -   1792 (99,9%) deles tiveram eleições municipais (Fernando de Noronha e \_\_\_\_\_\_, não)
+        -   1203 (22%) deles tiveram um candidato do PP entre os dois candidatos mais votados
 
-            -   1779 (99,2%) deles não tiveram segundo turno nas eleições municipais
+            -   487 (40%) deles tiveram uma eleição acirrada (isto é, seu candidato eleito teve no máximo 55% dos votos).
 
-                -   476 (26%) deles tiveram um candidato do PP entre os dois candidatos mais votados
-
-                    -   194 (41%) deles tiveram uma eleição acirrada (isto é, seu candidato eleito teve no máximo 55% dos votos)
-
-                        -   Note que quase se atinge os 200 indicados como referência para a lei dos grandes números pela profa. Beti Kira nas aulas de Estatística!
+                -   Note que isso representa quase um décimo de todos os municípios brasileiros que tiveram eleições.
 
 ### 1.1.3) Emendas parlamentares
 
@@ -284,12 +275,9 @@ de_para_emendas_municipios <- readRDS("Bases de dados/Brasil/BD_id_emenda_munici
             -   Filtro: "2021"
         -   Função (Desc)
         -   Funcional Localidade (Desc)
-        -   Funcional Localidade (Região)
-            -   Filtro: "REGIÃO NORDESTE" ou "NE"
         -   Funcional Localidade (Tipo)
             -   Filtro: "MUNICÍPIO"
         -   GND (Desc)
-            -   Isso é o Grupo de Natureza da Despesa (para esse filtro, Investimentos ou Outras Despesas Correntes)
         -   Empenhado (IPCA)
 
 ```{r}
@@ -374,7 +362,7 @@ writeLines(paste0(
 ))
 ```
 
--   Note que 287 municípios nordestinos foram favorecidos por algum empenho de emenda em 2021 e que essas emendas foram somente emendas individuais, de bancada e de relator.
+-   Note que \_\_\_\_ municípios brasileiros foram favorecidos por algum empenho de emenda em 2021 e que essas emendas foram dos tipos\_\_\_\_\_\_\_\_.
 
 ## 1.2) Junção de dados
 
@@ -392,8 +380,18 @@ for (muni in municipios_dt_eleicoes) {
 rm(municipios_dt_eleicoes, municipios_dt_municipios, muni)
 
 # Renomear municípios de dt_municipios fora do padrão de dt_eleicoes
+dt_municipios[id_municipio_nome == "Lauro Müller" & sigla_uf == "SC",
+              id_municipio_nome := "Lauro Muller"]
 dt_municipios[id_municipio_nome == "Santa Terezinha" & sigla_uf == "BA",
               id_municipio_nome := "Santa Teresinha"]
+dt_municipios[id_municipio_nome == "Grão-Pará" & sigla_uf == "SC",
+              id_municipio_nome := "Grão Pará"]
+dt_municipios[id_municipio_nome == "São Tomé das Letras" & sigla_uf == "MG",
+              id_municipio_nome := "São Thomé das Letras"]
+dt_municipios[id_municipio_nome == "Westfália" & sigla_uf == "RS",
+              id_municipio_nome := "Westfalia"]
+dt_municipios[id_municipio_nome == "Vespasiano Corrêa" & sigla_uf == "RS",
+              id_municipio_nome := "Vespasiano Correa"]
 
 # Repetir procedimento para ver se deu certo
 municipios_dt_eleicoes <- unique(dt_eleicoes[, paste0(id_municipio_nome, sigla_uf)])
@@ -500,9 +498,29 @@ writeLines(paste0(
   nrow(dt_relator[!is.na(valor_empenhado_ipca)])
 ))
 
-
 # Transformar NAs em 0
 dt_relator[is.na(valor_empenhado_ipca), valor_empenhado_ipca := 0]
+```
+
+#### 1.2.2.4) Para emendas de comissão
+
+```{r}
+# Filtrar por somente emendas de comissão
+dt_emendas_comissao <- dt_emendas[tipo_emenda == "comissão"]
+# Remover coluna de tipo
+dt_emendas_comissao[, tipo_emenda := NULL]
+
+# Adicionar dados sobre emendas ao dt_municipios_eleicoes
+dt_comissao <- merge(dt_municipios_eleicoes, dt_emendas_comissao, all.x = T, by = "id_municipio")
+
+# Ver quantos municípios com eleições acirradas receberam emendas
+writeLines(paste0(
+  "Quantidade de municípios com eleições acirradas que receberam emendas de comissão: ",
+  nrow(dt_comissao[!is.na(valor_empenhado_ipca)])
+))
+
+# Transformar NAs em 0
+dt_comissao[is.na(valor_empenhado_ipca), valor_empenhado_ipca := 0]
 ```
 
 # 2) Estatísticas descritivas
@@ -516,12 +534,11 @@ Agora, vamos mostrar que os municípios em que o candidato do PP ganhou vs. perd
 medias_municipios_eleicoes <- dt_municipios_eleicoes[
   ,
   .(
-    media_IDHm = mean(IDHm),
-    media_PIBpc = mean(PIBpc),
-    media_percentual_renda_pc_meio_sm = mean(percentual_renda_pc_meio_sm),
-    media_taxa_escolarizacao = mean(taxa_escolarizacao),
     media_pop = mean(pop),
-    media_densidade_demografica = mean(densidade_demografica)
+    media_densidade_demografica = mean(densidade_demografica),
+    media_PIBpc = mean(PIBpc),
+    media_taxa_escolarizacao = mean(taxa_escolarizacao),
+    media_mortalidade_infantil = mean(mortalidade_infantil, na.rm = T)
   ),
   by = vitoria_pp
 ]
@@ -558,19 +575,19 @@ medias_municipios_eleicoes %>%
        x = "Prefeito do PP?"),
 
 medias_municipios_eleicoes %>%
-  ggplot(aes(y = media_IDHm, x = as.factor(vitoria_pp))) +
-  geom_col() +
-  theme_minimal() +
-  labs(title = "",
-       y = "IDH municipal",
-       x = "Prefeito do PP?"),
-
-medias_municipios_eleicoes %>%
   ggplot(aes(y = media_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal() +
   labs(title = "",
        y = "Taxa de escolarização",
+       x = "Prefeito do PP?"),
+
+medias_municipios_eleicoes %>%
+  ggplot(aes(y = media_mortalidade_infantil, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal() +
+  labs(title = "",
+       y = "Mortalidade infantil",
        x = "Prefeito do PP?")
 ),
 
@@ -581,7 +598,7 @@ ncol = 1, rel_heights = c(0.15, 1)
 
 ```
 
--   As médias de densidade demográfica são as mais diferentes entre os dois grupos. Vamos olhar para a mediana para evitar o efeito de outliers:
+-   As médias de população e densidade demográfica são bastante diferentes entre os dois grupos. Vamos olhar para a mediana, que reduz o efeito de outliers:
 
 ## 2.2) Comparação de medianas das características municipais
 
@@ -590,12 +607,11 @@ ncol = 1, rel_heights = c(0.15, 1)
 medianas_municipios_eleicoes <- dt_municipios_eleicoes[
   ,
   .(
-    mediana_IDHm = median(IDHm),
-    mediana_PIBpc = median(PIBpc),
-    mediana_percentual_renda_pc_meio_sm = median(percentual_renda_pc_meio_sm),
-    mediana_taxa_escolarizacao = median(taxa_escolarizacao),
     mediana_pop = median(pop),
-    mediana_densidade_demografica = median(densidade_demografica)
+    mediana_densidade_demografica = median(densidade_demografica),
+    mediana_PIBpc = median(PIBpc),
+    mediana_taxa_escolarizacao = median(taxa_escolarizacao),
+    mediana_mortalidade_infantil = median(mortalidade_infantil, na.rm = T)
   ),
   by = vitoria_pp
 ]
@@ -632,19 +648,19 @@ medianas_municipios_eleicoes %>%
        x = "Prefeito do PP?"),
 
 medianas_municipios_eleicoes %>%
-  ggplot(aes(y = mediana_IDHm, x = as.factor(vitoria_pp))) +
-  geom_col() +
-  theme_minimal() +
-  labs(title = "",
-       y = "IDH municipal",
-       x = "Prefeito do PP?"),
-
-medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal() +
   labs(title = "",
        y = "Taxa de escolarização",
+       x = "Prefeito do PP?"),
+
+medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_mortalidade_infantil, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal() +
+  labs(title = "",
+       y = "Mortalidade infantil",
        x = "Prefeito do PP?")
 ),
 
@@ -652,13 +668,11 @@ ncol = 1, rel_heights = c(0.15, 1)
 )
 ```
 
--   Usando a mediana, as médias de densidade demográfica ficaram mais parecidas, mas as de PIB *per capita*, um pouco menos.
+-   Usando a mediana, as médias de população e densidade demográfica ficaram bem mais parecidas, mas as de mortalidade infantil, um pouco menos.
 
-## 2.3) Valores empenhados via emendas parlamentares
+## 2.4) Valores empenhados via emendas parlamentares
 
-Para mostrar se seria melhor permitir duas funções de cada lado, queria plotar a relação entre o valor empenhado de emendas parlamentares e a razão de votos (considerando somente o top 2) do candidato do PP quando ele esteve entre os 2 candidatos mais votados. No entanto, acho que precisaria ter montado a base de dados incluindo todos os municípios com eleições incluindo o PP, não só os de eleições acirradas. Daria para voltar e fazer isso, mas teria que checar mais questões de compatibilidade entre bases (exs.: ausência de municípios em uma base, diferenças de ortografia etc.).
-
-Por isso, vamos somente plotar a soma de valores empenhados via para municípios que tiveram eleições acirradas e elegeram ou não o candidato do PP, o que seria equivalente a visualizar o modelo mais simples de RDD.
+Vamos plotar a soma de valores empenhados para municípios que tiveram eleições acirradas e elegeram ou não o candidato do PP, o que seria equivalente a visualizar o modelo mais simples de RDD.
 
 ```{r}
 # Plotar diferença em valores empenhados pelo resultado da eleição
@@ -693,6 +707,24 @@ dt_bancada %>%
   theme_minimal() +
   labs(title = "",
        y = "EPs de bancada",
+       x = "Prefeito do PP?"),
+
+dt_relator %>%
+  ggplot(aes(y = valor_empenhado_ipca, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  scale_y_continuous(labels = label_currency(prefix = "R$ ", suffix = " MM", scale = 1/1000000)) +
+  theme_minimal() +
+  labs(title = "",
+       y = "EPs de relator",
+       x = "Prefeito do PP?"),
+
+dt_comissao %>%
+  ggplot(aes(y = valor_empenhado_ipca, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  scale_y_continuous(labels = label_currency(prefix = "R$ ", suffix = " MM", scale = 1/1000000)) +
+  theme_minimal() +
+  labs(title = "",
+       y = "EPs de comissão",
        x = "Prefeito do PP?")
 ),
 
@@ -700,11 +732,13 @@ ncol = 1, rel_heights = c(0.15, 1)
 )
 ```
 
+O ideal seria também plotar gráficos com x = share dos votos e y = cada característica municipal (para verificar que são contínuas) e x = share dos votos e y = valores empenhados por emendas (para visualizar a forma das funções e ver se seria melhor estimar uma função para cada lado do corte). Para isso, seria necessário não limitar a janela a 45% \< votos_razao_pp \< 55% e mudar os *merges* subsequentes. Isso será feito num código auxiliar.
+
 # 3) Estimação
 
 Vamos estimar o valor adicional recebido via emendas parlamentares pelos municípios em que o candidato a prefeito do PP ganhou por pouco, usando alguns modelos diferentes.
 
--   Note que, quando o modelo inclui a running variable, é sua versão centralizada (votos_razao_pp_centr), porque isso evita que o intercepto tenha valores sem sentido (como valores empenhados negativos)
+-   Note que, quando o modelo inclui a running variable, é sua versão centralizada (votos_razao_pp_centr), porque isso evita que o intercepto tenha valores sem sentido (como valores empenhados negativos).
 
 ## 3.1) Para todas as emendas
 
@@ -734,7 +768,9 @@ modelsummary(list(
 
 ## 3.3) Para emendas de bancada
 
-## 3.3) Para emendas de relator
+## 3.4) Para emendas de relator
+
+## 3.5) Para emendas de comissão
 
 # 4) Teste de robustez
 
