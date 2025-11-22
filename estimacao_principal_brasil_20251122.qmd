@@ -180,6 +180,11 @@ str(dt_municipios)
 dt_eleicoes <- readRDS("Bases de dados/Brasil/TSE_eleicoes.rds")
 setDT(dt_eleicoes)
 
+# Retirar municípios que tiveram eleições suplementares, identificados pela presença de mais de um candidato eleito na base
+municipios_com_mais_de_um_eleito <- dt_eleicoes[resultado == "eleito", .N, by = id_municipio][N>1, unique(id_municipio)]
+dt_eleicoes <- dt_eleicoes[!(id_municipio %in% municipios_com_mais_de_um_eleito)]
+rm(municipios_com_mais_de_um_eleito)
+
 # Retirar primeiro turno dos municípios que tiveram segundo turno
 municipios_com_segundo_turno <- dt_eleicoes[turno == 2, unique(id_municipio)]
 dt_eleicoes <- dt_eleicoes[!(turno == 1 &
@@ -512,12 +517,25 @@ rm(dt_emendas)
 ### 2.1.1) Características municipais
 
 ```{r}
+#| label: grafico_caracteristicas_municipais_por_razao_votos_pp
 
+dt_todas %>%
+  ggplot(aes(x = votos_razao_pp, y = pop)) +
+  geom_point(shape = 21) +
+  geom_vline(xintercept = 0.5) +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() +
+  labs(title = "",
+       y = "População",
+       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)",
+       color = "Partido do candidato eleito")
 ```
 
 ### 2.2.1) Valores empenhados de emendas parlamentares
 
 ```{r}
+#| label: grafico_valor_empenhado_por_razao_votos_pp
+
 
 ```
 
@@ -560,6 +578,8 @@ writeLines(paste0(
 #### 2.2.1.1) Via médias
 
 ```{r}
+#| label: grafico_barras_medias_caracteristicas_municipais
+
 # Criar dt com médias
 medias_municipios_eleicoes <- dt_municipios_eleicoes[
   ,
@@ -632,6 +652,8 @@ rm(medias_municipios_eleicoes, titulo, graficos, g1, g2, g3, g4, g5)
 #### 2.2.1.1) Via medianas
 
 ```{r}
+#| label: grafico_barras_medianas_caracteristicas_municipais
+
 # Criar dt com medianas
 medianas_municipios_eleicoes <- dt_municipios_eleicoes[
   ,
@@ -703,6 +725,8 @@ rm(medianas_municipios_eleicoes, titulo, graficos, g1, g2, g3, g4, g5)
 Vamos plotar a média dos valores empenhados per capita dos municípios que tiveram eleições acirradas e elegeram ou não o candidato do PP, o que seria equivalente a visualizar o modelo mais simples de RDD.
 
 ```{r}
+#| label: grafico_barras_medias_emendas_parlamentares
+
 # Criar dts com médias
 media_empenho_total <- dt_todas[
   ,
@@ -759,6 +783,8 @@ rm(media_empenho_total, media_empenho_individuais, media_empenho_bancada, titulo
 ```
 
 -   Note que aquelas poucas emendas de bancada distorcem bastante a média do valor empenhado por todas as emendas.
+
+-   Note que não faz sentido olhar para medianas porque seriam simplesmente 0 para os dois grupos.
 
 # 3) Estimação
 
