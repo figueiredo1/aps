@@ -741,10 +741,10 @@ regs_lineares <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_c
 regs_flexiveis <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_todas)
 
 # Duas regressões lineares com controles
-regs_lineares_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_todas)
+regs_lineares_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_todas)
 
 # Duas regressões com linearidade flexibilizada e controles
-regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_todas)
+regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_todas)
 
 # Resultados
 modelsummary(list(
@@ -768,10 +768,10 @@ regs_lineares <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_c
 regs_flexiveis <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_individuais)
 
 # Duas regressões lineares com controles
-regs_lineares_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_individuais)
+regs_lineares_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_individuais)
 
 # Duas regressões com linearidade flexibilizada e controles
-regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_individuais)
+regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_individuais)
 
 # Resultados
 modelsummary(list(
@@ -795,10 +795,10 @@ regs_lineares <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_c
 regs_flexiveis <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_bancada)
 
 # Duas regressões lineares com controles
-regs_lineares_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_bancada)
+regs_lineares_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_bancada)
 
 # Duas regressões com linearidade flexibilizada e controles
-regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao + mortalidade_infantil, data = dt_bancada)
+regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_bancada)
 
 # Resultados
 modelsummary(list(
