@@ -235,8 +235,6 @@ Note que:
 
 -   1203 (22% dos 5567) tiveram um candidato do PP entre os dois candidatos mais votados;
 
-<!-- -->
-
 -   487 (40% dos 1203 e 9% dos 5567) tiveram uma eleição acirrada (isto é, na qual o candidato eleito teve no máximo 55% da soma dos votos nos dois candidatos mais populares).
 
 ### 1.1.3) Emendas parlamentares
@@ -737,16 +735,16 @@ Vamos estimar o valor adicional recebido via emendas parlamentares pelos municí
 
 ```{r}
 # Duas regressões lineares com controle de razão de votos do PP
-regs_lineares <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr, data = dt_todas)
+regs_lineares <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr, data = dt_todas)
 
 # Duas regressões com linearidade flexibilizada e controle de razão de votos do PP
-regs_flexiveis <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_todas)
+regs_flexiveis <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_todas)
 
 # Duas regressões lineares com controles
-regs_lineares_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_todas)
+regs_lineares_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_todas)
 
 # Duas regressões com linearidade flexibilizada e controles
-regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_todas)
+regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_todas)
 
 # Resultados
 modelsummary(list(
@@ -756,7 +754,7 @@ modelsummary(list(
     "Duas regressões não lineares com controles" = regs_flexiveis_controles
   ),
   statistic = NULL, stars = T, gof_omit = "R2|AIC|BIC|RMSE",
-  output = "Resultados/ValorEmpenhadoTotal.png"
+  output = "Resultados/ValorEmpenhadoPerCapitaTotal.png"
   )
 ```
 
@@ -764,16 +762,16 @@ modelsummary(list(
 
 ```{r}
 # Duas regressões lineares com controle de razão de votos do PP
-regs_lineares <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr, data = dt_individuais)
+regs_lineares <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr, data = dt_individuais)
 
 # Duas regressões com linearidade flexibilizada e controle de razão de votos do PP
-regs_flexiveis <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_individuais)
+regs_flexiveis <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_individuais)
 
 # Duas regressões lineares com controles
-regs_lineares_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_individuais)
+regs_lineares_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_individuais)
 
 # Duas regressões com linearidade flexibilizada e controles
-regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_individuais)
+regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_individuais)
 
 # Resultados
 modelsummary(list(
@@ -783,7 +781,7 @@ modelsummary(list(
     "Duas regressões não lineares com controles" = regs_flexiveis_controles
   ),
   statistic = NULL, stars = T, gof_omit = "R2|AIC|BIC|RMSE",
-  output = "Resultados/ValorEmpenhadoIndividuais.png"
+  output = "Resultados/ValorEmpenhadoPerCapitaIndividuais.png"
 )
 ```
 
@@ -791,16 +789,16 @@ modelsummary(list(
 
 ```{r}
 # Duas regressões lineares com controle de razão de votos do PP
-regs_lineares <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr, data = dt_bancada)
+regs_lineares <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr, data = dt_bancada)
 
 # Duas regressões com linearidade flexibilizada e controle de razão de votos do PP
-regs_flexiveis <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_bancada)
+regs_flexiveis <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_bancada)
 
 # Duas regressões lineares com controles
-regs_lineares_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_bancada)
+regs_lineares_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_bancada)
 
 # Duas regressões com linearidade flexibilizada e controles
-regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_bancada)
+regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_bancada)
 
 # Resultados
 modelsummary(list(
@@ -810,6 +808,6 @@ modelsummary(list(
     "Duas regressões não lineares com controles" = regs_flexiveis_controles
   ),
   statistic = NULL, stars = T, gof_omit = "R2|AIC|BIC|RMSE",
-  output = "Resultados/ValorEmpenhadoBancada.png"
+  output = "Resultados/ValorEmpenhadoPerCapitaBancada.png"
 )
 ```
