@@ -220,15 +220,13 @@ dt_eleicoes[, votos_razao_pp_centr_sq := votos_razao_pp_centr^2]
 str(dt_eleicoes)
 ```
 
--   Note que:
+Note que:
 
-    -   5567 municípios brasileiros tiveram eleições para prefeito em 2020
+5567 municípios brasileiros tiveram eleições para prefeito em 2020;
 
-        -   1203 (22%) deles tiveram um candidato do PP entre os dois candidatos mais votados
+1203 (22% dos 5567) tiveram um candidato do PP entre os dois candidatos mais votados;
 
-            -   487 (40%) deles tiveram uma eleição acirrada (isto é, seu candidato eleito teve no máximo 55% dos votos).
-
-                -   Note que isso representa quase um décimo de todos os municípios brasileiros que tiveram eleições.
+-   487 (40% dos 1203 e 9% dos 5567) tiveram uma eleição acirrada (isto é, na qual o candidato eleito teve no máximo 55% da soma dos votos nos dois candidatos mais populares).
 
 ### 1.1.3) Emendas parlamentares
 
@@ -527,55 +525,54 @@ medias_municipios_eleicoes <- dt_municipios_eleicoes[
 ]
 
 # Plotar médias de quem venceu vs. não venceu - formatar
-plot_grid(
-ggplot() + 
-  labs(title = "Comparação das médias de características municipais", subtitle = "Fontes dos dados: TSE, IBGE (2021, 2022). Elaboração própria.") + 
-  theme_minimal(),
+titulo <- ggplot() + 
+  labs(title = "Comparação das médias de características municipais", subtitle = "Fontes dos dados: TSE, IBGE (2021, 2022). Elaboração própria.") +
+  theme_minimal()
 
-plot_grid(
-medias_municipios_eleicoes %>%
+g1 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_pop, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal() +
   labs(title = "",
        y = "População",
-       x = "Prefeito do PP?"),
+       x = "Prefeito do PP?")
 
-medias_municipios_eleicoes %>%
+g2 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_densidade_demografica, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal() +
   labs(title = "",
-       y = "Ðensidade demográfica",
-       x = "Prefeito do PP?"),
+       y = "Densidade demográfica",
+       x = "Prefeito do PP?")
 
-medias_municipios_eleicoes %>%
+g3 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_PIBpc, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal() +
   labs(title = "",
        y = "PIB per capita",
-       x = "Prefeito do PP?"),
+       x = "Prefeito do PP?")
 
-medias_municipios_eleicoes %>%
+g4 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal() +
   labs(title = "",
        y = "Taxa de escolarização",
-       x = "Prefeito do PP?"),
+       x = "Prefeito do PP?")
 
-medias_municipios_eleicoes %>%
+g5 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_mortalidade_infantil, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal() +
   labs(title = "",
        y = "Mortalidade infantil",
        x = "Prefeito do PP?")
-),
 
-ncol = 1, rel_heights = c(0.15, 1)
-)
+graficos <- plot_grid(g1, g2, g3, g4, g5)
+
+plot_grid(titulo, graficos, ncol = 1, rel_heights = c(0.15, 1))
+
 
 # Mostrar quais diferenças são estatisticamente significantes - fazer teste de comparação des
 
@@ -600,55 +597,53 @@ medianas_municipios_eleicoes <- dt_municipios_eleicoes[
 ]
 
 # Plotar medianas de quem venceu vs. não venceu - formatar
-plot_grid(
-ggplot() + 
+titulo <- ggplot() + 
   labs(title = "Comparação das medianas de características municipais", subtitle = "Fontes dos dados: TSE (2021), IBGE (2021, 2022). Elaboração própria.") + 
-  theme_minimal(),
+  theme_minimal()
 
-plot_grid(
-medianas_municipios_eleicoes %>%
-  ggplot(aes(y = mediana_pop, x = as.factor(vitoria_pp))) +
+g1 <- medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_pop, x = as.factor(vitoria_pp), data = )) +
   geom_col() +
   theme_minimal() +
   labs(title = "",
        y = "População",
-       x = "Prefeito do PP?"),
+       x = "Prefeito do PP?")
 
-medianas_municipios_eleicoes %>%
+g2 <- medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_densidade_demografica, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal() +
   labs(title = "",
-       y = "Ðensidade demográfica",
-       x = "Prefeito do PP?"),
+       y = "Densidade demográfica",
+       x = "Prefeito do PP?")
 
-medianas_municipios_eleicoes %>%
+g3 <- medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_PIBpc, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal() +
   labs(title = "",
        y = "PIB per capita",
-       x = "Prefeito do PP?"),
+       x = "Prefeito do PP?")
 
-medianas_municipios_eleicoes %>%
+g4 <- medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal() +
   labs(title = "",
        y = "Taxa de escolarização",
-       x = "Prefeito do PP?"),
+       x = "Prefeito do PP?")
 
-medianas_municipios_eleicoes %>%
+g5 <- medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_mortalidade_infantil, x = as.factor(vitoria_pp))) +
   geom_col() +
   theme_minimal() +
   labs(title = "",
        y = "Mortalidade infantil",
        x = "Prefeito do PP?")
-),
 
-ncol = 1, rel_heights = c(0.15, 1)
-)
+graficos <- plot_grid(g1, g2, g3, g4, g5)
+
+plot_grid(titulo, graficos, ncol = 1, rel_heights = c(0.15, 1))
 ```
 
 -   Usando a mediana, as médias de população e densidade demográfica ficaram bem mais parecidas, mas as de mortalidade infantil, um pouco menos.
@@ -676,31 +671,29 @@ media_empenho_bancada <- dt_bancada[
 ]
 
 # Plotar diferença em valores empenhados pelo resultado da eleição
-plot_grid(
-ggplot() + 
+titulo <- ggplot() + 
   labs(title = "Comparação de médias de valor empenhado per capita municipal", subtitle = "Fontes dos dados: TSE (2021), SIGA Brasil (2021). Elaboração própria.") + 
-  theme_minimal(),
+  theme_minimal()
 
-plot_grid(
-media_empenho_total %>%
+g1 <- media_empenho_total %>%
   ggplot(aes(y = media_empenho, x = as.factor(vitoria_pp))) +
   geom_col() +
   scale_y_continuous(labels = label_currency(prefix = "R$ ")) +
   theme_minimal() +
   labs(title = "",
        y = "Todas as EPs",
-       x = "Prefeito do PP?"),
+       x = "Prefeito do PP?")
 
-media_empenho_individuais %>%
+g2 <- media_empenho_individuais %>%
   ggplot(aes(y = media_empenho, x = as.factor(vitoria_pp))) +
   geom_col() +
   scale_y_continuous(labels = label_currency(prefix = "R$ ")) +
   theme_minimal() +
   labs(title = "",
        y = "EPs individuais",
-       x = "Prefeito do PP?"),
+       x = "Prefeito do PP?")
 
-media_empenho_bancada %>%
+g3 <- media_empenho_bancada %>%
   ggplot(aes(y = media_empenho, x = as.factor(vitoria_pp))) +
   geom_col() +
   scale_y_continuous(labels = label_currency(prefix = "R$ ")) +
@@ -708,10 +701,10 @@ media_empenho_bancada %>%
   labs(title = "",
        y = "EPs de bancada",
        x = "Prefeito do PP?")
-),
 
-ncol = 1, rel_heights = c(0.15, 1)
-)
+graficos <- plot_grid(g1, g2, g3)
+
+plot_grid(titulo, graficos, ncol = 1, rel_heights = c(0.15, 1))
 ```
 
 # 3) Estimação

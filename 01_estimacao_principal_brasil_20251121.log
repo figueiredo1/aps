@@ -1,4 +1,4 @@
-This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.11.27)  22 NOV 2025 03:12
+This is XeTeX, Version 3.141592653-2.6-0.999996 (TeX Live 2024) (preloaded format=xelatex 2024.11.27)  22 NOV 2025 03:48
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1074,15 +1074,15 @@ See the LaTeX manual or LaTeX Companion for explanation.
 Type  H <return>  for immediate help.
  ...                                              
                                                   
-l.577         \begin{itemize}
+l.605         \begin{itemize}
                               
 Here is how much of TeX's memory you used:
- 28983 strings out of 475903
- 607713 string characters out of 5774754
+ 28984 strings out of 475903
+ 607718 string characters out of 5774754
  1287884 words of memory out of 5000000
- 51519 multiletter control sequences out of 15000+600000
+ 51520 multiletter control sequences out of 15000+600000
  561779 words of font info for 71 fonts, out of 8000000 for 9000
  36 hyphenation exceptions out of 8191
- 108i,7n,123p,10933b,1206s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 108i,7n,123p,10933b,1100s stack positions out of 10000i,1000n,20000p,200000b,200000s
 
 Output written on 01_estimacao_principal_brasil_20251121.pdf (7 pages).
