@@ -258,9 +258,8 @@ Note que:
 -   Variáveis selecionadas:
 
     -   ano_emenda
-
-    \*Filtro: "2021". Apesar de essa variável representar o ano em que a emenda foi proposta, não o ano do empenho, o Siga Brasil mostra que todas as 1183 emendas destinadas a municípios com empenho em 2021 foram propostas em 2021.
-
+        -   Filtro: "2021"
+            -   Apesar de essa variável representar o ano em que a emenda foi proposta, não o ano do empenho, o Siga Brasil mostra que todas as 1183 emendas destinadas a municípios com empenho em 2021 foram propostas em 2021.
     -   id_emenda
     -   numero_emenda
     -   id_municipio_gasto
@@ -289,32 +288,29 @@ Note que:
 #                                                          ano_emenda)]
 # 
 # # Selecionar somente as colunas de de-para
-# de_para_emendas_municipios <- de_para_emendas_municipios[, .(emenda_numero_ano, id_municipio)]
+# de_para_emendas_municipios <- de_para_emendas_municipios[, .(emenda_numero_ano, id_autor_emenda, id_municipio)]
 # 
 # # Salvar base de dados resultante
 # saveRDS(de_para_emendas_municipios, "Bases de dados/Brasil/BD_id_emenda_municipio.rds")
 
 # Carregar base de dados que relaciona emendas e municípios (por código do IBGE)
 de_para_emendas_municipios <- readRDS("Bases de dados/Brasil/BD_id_emenda_municipio.rds")
+de_para_emendas_municipios[, id_autor_emenda := NULL]
 ```
 
 -   Origem dos dados: [Senado Federal \> Portal do Orçamento \> Siga Brasil \> Painel Emendas](https://www9qs.senado.leg.br/extensions/Siga_Brasil_Emendas/Siga_Brasil_Emendas.html) \> Gráficos customizados
 
     -   Variáveis selecionadas:
-    -   Autor (Tipo)
-    -   Emenda (Número-Ano)
-    -   Empenho (Ano)
-
-    \*Filtro: "2021"
-
-    -   Função (Desc)
-    -   Funcional Localidade (Desc)
-    -   Funcional Localidade (Tipo)
-
-    \*Filtro: "MUNICÍPIO"
-
-    -   GND (Desc)
-    -   Empenhado (IPCA)
+        -   Autor (Tipo)
+        -   Emenda (Número-Ano)
+        -   Empenho (Ano)
+            -   Filtro: "2021"
+        -   Função (Desc)
+        -   Funcional Localidade (Desc)
+        -   Funcional Localidade (Tipo)
+            -   Filtro: "MUNICÍPIO"
+        -   GND (Desc)
+        -   Empenhado (IPCA)
 
 ```{r}
 # Carregar base de dados de emendas parlamentares
@@ -595,7 +591,7 @@ dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_p
   stat_smooth(method = "lm", formula = y ~ x, se = F) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  scale_y_continuous(labels = label_number()) +
+  scale_y_continuous(labels = label_currency(prefix = "R$ ")) +
   theme_minimal() + guides(color = "none") +
   labs(title = "",
        y = "Valor empenhado per capita",
@@ -709,6 +705,7 @@ g3 <- medias_municipios_eleicoes %>%
 g4 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
+  scale_y_continuous(labels = label_percent()) +
   theme_minimal() +
   labs(title = "",
        y = "Taxa de escolarização",
@@ -785,6 +782,7 @@ g3 <- medianas_municipios_eleicoes %>%
 g4 <- medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
+  scale_y_continuous(labels = label_percent()) +
   theme_minimal() +
   labs(title = "",
        y = "Taxa de escolarização",
@@ -994,6 +992,7 @@ g3 <- medias_municipios_eleicoes %>%
 g4 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
+  scale_y_continuous(labels = label_percent()) +
   theme_minimal() +
   labs(title = "",
        y = "Taxa de escolarização",
@@ -1070,6 +1069,7 @@ g3 <- medianas_municipios_eleicoes %>%
 g4 <- medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
+  scale_y_continuous(labels = label_percent()) +
   theme_minimal() +
   labs(title = "",
        y = "Taxa de escolarização",
@@ -1202,7 +1202,7 @@ dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_p
   stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0, linetype = "dashed") +
-  scale_y_continuous(labels = label_number()) +
+  scale_y_continuous(labels = label_currency(prefix = "R$ ")) +
   theme_minimal() + guides(color = "none") +
   labs(title = "",
        y = "Valor empenhado per capita",
@@ -1318,6 +1318,7 @@ g3 <- medias_municipios_eleicoes %>%
 g4 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
+  scale_y_continuous(labels = label_percent()) +
   theme_minimal() +
   labs(title = "",
        y = "Taxa de escolarização",
@@ -1394,6 +1395,7 @@ g3 <- medianas_municipios_eleicoes %>%
 g4 <- medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
+  scale_y_continuous(labels = label_percent()) +
   theme_minimal() +
   labs(title = "",
        y = "Taxa de escolarização",

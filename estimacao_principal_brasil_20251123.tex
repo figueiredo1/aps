@@ -543,15 +543,21 @@ parlamentares}\label{emendas-parlamentares}
   \tightlist
   \item
     ano\_emenda
-  \end{itemize}
 
-  *Filtro: ``2021''. Apesar de essa variável representar o ano em que a
-  emenda foi proposta, não o ano do empenho, o Siga Brasil mostra que
-  todas as 1183 emendas destinadas a municípios com empenho em 2021
-  foram propostas em 2021.
+    \begin{itemize}
+    \tightlist
+    \item
+      Filtro: ``2021''
 
-  \begin{itemize}
-  \tightlist
+      \begin{itemize}
+      \tightlist
+      \item
+        Apesar de essa variável representar o ano em que a emenda foi
+        proposta, não o ano do empenho, o Siga Brasil mostra que todas
+        as 1183 emendas destinadas a municípios com empenho em 2021
+        foram propostas em 2021.
+      \end{itemize}
+    \end{itemize}
   \item
     id\_emenda
   \item
@@ -586,13 +592,14 @@ parlamentares}\label{emendas-parlamentares}
 \CommentTok{\#                                                          ano\_emenda)]}
 \CommentTok{\# }
 \CommentTok{\# \# Selecionar somente as colunas de de{-}para}
-\CommentTok{\# de\_para\_emendas\_municipios \textless{}{-} de\_para\_emendas\_municipios[, .(emenda\_numero\_ano, id\_municipio)]}
+\CommentTok{\# de\_para\_emendas\_municipios \textless{}{-} de\_para\_emendas\_municipios[, .(emenda\_numero\_ano, id\_autor\_emenda, id\_municipio)]}
 \CommentTok{\# }
 \CommentTok{\# \# Salvar base de dados resultante}
 \CommentTok{\# saveRDS(de\_para\_emendas\_municipios, "Bases de dados/Brasil/BD\_id\_emenda\_municipio.rds")}
 
 \CommentTok{\# Carregar base de dados que relaciona emendas e municípios (por código do IBGE)}
 \NormalTok{de\_para\_emendas\_municipios }\OtherTok{\textless{}{-}} \FunctionTok{readRDS}\NormalTok{(}\StringTok{"Bases de dados/Brasil/BD\_id\_emenda\_municipio.rds"}\NormalTok{)}
+\NormalTok{de\_para\_emendas\_municipios[, id\_autor\_emenda }\SpecialCharTok{:}\ErrorTok{=} \ConstantTok{NULL}\NormalTok{]}
 \end{Highlighting}
 \end{Shaded}
 
@@ -607,34 +614,38 @@ parlamentares}\label{emendas-parlamentares}
   \tightlist
   \item
     Variáveis selecionadas:
-  \item
-    Autor (Tipo)
-  \item
-    Emenda (Número-Ano)
-  \item
-    Empenho (Ano)
-  \end{itemize}
 
-  *Filtro: ``2021''
+    \begin{itemize}
+    \tightlist
+    \item
+      Autor (Tipo)
+    \item
+      Emenda (Número-Ano)
+    \item
+      Empenho (Ano)
 
-  \begin{itemize}
-  \tightlist
-  \item
-    Função (Desc)
-  \item
-    Funcional Localidade (Desc)
-  \item
-    Funcional Localidade (Tipo)
-  \end{itemize}
+      \begin{itemize}
+      \tightlist
+      \item
+        Filtro: ``2021''
+      \end{itemize}
+    \item
+      Função (Desc)
+    \item
+      Funcional Localidade (Desc)
+    \item
+      Funcional Localidade (Tipo)
 
-  *Filtro: ``MUNICÍPIO''
-
-  \begin{itemize}
-  \tightlist
-  \item
-    GND (Desc)
-  \item
-    Empenhado (IPCA)
+      \begin{itemize}
+      \tightlist
+      \item
+        Filtro: ``MUNICÍPIO''
+      \end{itemize}
+    \item
+      GND (Desc)
+    \item
+      Empenhado (IPCA)
+    \end{itemize}
   \end{itemize}
 \end{itemize}
 
@@ -1064,7 +1075,7 @@ parlamentares}{2.1.2) Valor empenhado per capita de emendas parlamentares}}\labe
   \FunctionTok{stat\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{formula =}\NormalTok{ y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ x, }\AttributeTok{se =}\NormalTok{ F) }\SpecialCharTok{+}
   \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \DecValTok{0}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_currency}\NormalTok{(}\AttributeTok{prefix =} \StringTok{"R$ "}\NormalTok{)) }\SpecialCharTok{+}
   \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Valor empenhado per capita"}\NormalTok{,}
@@ -1208,6 +1219,7 @@ municipais}\label{caracteruxedsticas-municipais-2}
 \NormalTok{g4 }\OtherTok{\textless{}{-}}\NormalTok{ medias\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ media\_taxa\_escolarizacao, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_percent}\NormalTok{()) }\SpecialCharTok{+}
   \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Taxa de escolarização"}\NormalTok{,}
@@ -1295,6 +1307,7 @@ municipais}\label{caracteruxedsticas-municipais-2}
 \NormalTok{g4 }\OtherTok{\textless{}{-}}\NormalTok{ medianas\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ mediana\_taxa\_escolarizacao, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_percent}\NormalTok{()) }\SpecialCharTok{+}
   \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Taxa de escolarização"}\NormalTok{,}
@@ -1584,6 +1597,7 @@ municipais}\label{caracteruxedsticas-municipais-3}
 \NormalTok{g4 }\OtherTok{\textless{}{-}}\NormalTok{ medias\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ media\_taxa\_escolarizacao, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_percent}\NormalTok{()) }\SpecialCharTok{+}
   \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Taxa de escolarização"}\NormalTok{,}
@@ -1671,6 +1685,7 @@ municipais}\label{caracteruxedsticas-municipais-3}
 \NormalTok{g4 }\OtherTok{\textless{}{-}}\NormalTok{ medianas\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ mediana\_taxa\_escolarizacao, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_percent}\NormalTok{()) }\SpecialCharTok{+}
   \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Taxa de escolarização"}\NormalTok{,}
@@ -1846,7 +1861,7 @@ parlamentares}{7.1.2) Valor empenhado per capita de emendas parlamentares}}\labe
   \FunctionTok{stat\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =}\NormalTok{ F, }\AttributeTok{formula =}\NormalTok{ y }\SpecialCharTok{\textasciitilde{}} \FunctionTok{poly}\NormalTok{(x, }\DecValTok{2}\NormalTok{)) }\SpecialCharTok{+}
   \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \DecValTok{0}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_currency}\NormalTok{(}\AttributeTok{prefix =} \StringTok{"R$ "}\NormalTok{)) }\SpecialCharTok{+}
   \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Valor empenhado per capita"}\NormalTok{,}
@@ -2002,6 +2017,7 @@ municipais}\label{caracteruxedsticas-municipais-5}
 \NormalTok{g4 }\OtherTok{\textless{}{-}}\NormalTok{ medias\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ media\_taxa\_escolarizacao, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_percent}\NormalTok{()) }\SpecialCharTok{+}
   \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Taxa de escolarização"}\NormalTok{,}
@@ -2089,6 +2105,7 @@ municipais}\label{caracteruxedsticas-municipais-5}
 \NormalTok{g4 }\OtherTok{\textless{}{-}}\NormalTok{ medianas\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ mediana\_taxa\_escolarizacao, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_percent}\NormalTok{()) }\SpecialCharTok{+}
   \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Taxa de escolarização"}\NormalTok{,}
