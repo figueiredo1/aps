@@ -28,6 +28,7 @@ library(readxl) # para obtenção dos dados
 library(basedosdados) # para obtenção dos dados
 library(dplyr) # para transformação dos dados
 library(data.table) # para transformação dos dados
+library(tibble) # para transformação dos dados
 library(janitor) # para transformação dos dados
 library(ggplot2) # para visualização dos dados
 library(cowplot) # para visualização dos dados (plotá-los lado a lado)
@@ -522,6 +523,7 @@ Note que filtramos os municípios para os percentis 2 a 99 de cada característi
 ```{r}
 #| label: grafico_caracteristicas_municipais_por_razao_votos_pp
 
+# Linear
 g_pop <- dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
   ggplot(aes(x = votos_razao_pp, y = pop, color = as.factor(vitoria_pp))) +
   geom_point(shape = 21, size = 0.5, color = "black") +
@@ -571,6 +573,59 @@ g_taxa_escolarizacao <- dt_todas[taxa_escolarizacao %between% quantile(taxa_esco
        x = "Razão de votos do PP")
 
 plot_grid(g_pop, g_densidade_demografica, g_PIBpc, g_taxa_escolarizacao, ncol = 2)
+
+
+
+# Quadrático
+g_pop <- dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = pop, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, size = 0.5, color = "black") +
+  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() + guides(color = "none") +
+  labs(title = "",
+       y = "População",
+       x = "Razão de votos do PP")
+
+g_densidade_demografica <- dt_todas[densidade_demografica %between% quantile(densidade_demografica, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = densidade_demografica, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, size = 0.5, color = "black") +
+  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() + guides(color = "none") +
+  labs(title = "",
+       y = "Densidade\ndemográfica",
+       x = "Razão de votos do PP")
+
+g_PIBpc <- dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = PIBpc, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, size = 0.5, color = "black") +
+  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() + guides(color = "none") +
+  labs(title = "",
+       y = "PIB per capita",
+       x = "Razão de votos do PP")
+
+g_taxa_escolarizacao <- dt_todas[taxa_escolarizacao %between% quantile(taxa_escolarizacao, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = taxa_escolarizacao, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, size = 0.5, color = "black") +
+  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() + guides(color = "none") +
+  labs(title = "",
+       y = "Taxa de\nescolarização",
+       x = "Razão de votos do PP")
+
+plot_grid(g_pop, g_densidade_demografica, g_PIBpc, g_taxa_escolarizacao, ncol = 2)
 ```
 
 ### 2.2.1) Valor empenhado *per capita* de emendas parlamentares
@@ -578,10 +633,25 @@ plot_grid(g_pop, g_densidade_demografica, g_PIBpc, g_taxa_escolarizacao, ncol = 
 ```{r}
 #| label: grafico_valor_empenhado_por_razao_votos_pp
 
+# Linear
 dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_pc, c(.02, .99), na.rm = TRUE)] %>%
   ggplot(aes(x = votos_razao_pp, y = valor_empenhado_ipca_pc, color = as.factor(vitoria_pp))) +
   geom_point(shape = 21, color = "black") +
-  stat_smooth(method = "lm", se = F) + scale_color_brewer(palette = "Dark2", direction = -1) + scale_color_brewer(palette = "Dark2", direction = -1) +
+  stat_smooth(method = "lm", formula = y ~ x, se = F) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() + guides(color = "none") +
+  labs(title = "",
+       y = "Valor empenhado per capita",
+       x = "Razão de votos do PP")
+
+# Quadrático
+dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_pc, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp, y = valor_empenhado_ipca_pc, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, color = "black") +
+  stat_smooth(method = "lm", formula = y ~ poly(x, 2), se = F) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
   theme_minimal() + guides(color = "none") +
@@ -690,7 +760,9 @@ g5 <- medias_municipios_eleicoes %>%
 
 graficos <- plot_grid(g1, g2, g3, g4, g5)
 
-plot_grid(titulo, graficos, ncol = 1, rel_heights = c(0.15, 1))
+# plot_grid(graficos, ncol = 1, rel_heights = c(0.15, 1))
+graficos
+
 rm(medias_municipios_eleicoes, titulo, graficos, g1, g2, g3, g4, g5)
 
 # Mostrar quais diferenças são estatisticamente significantes - fazer teste de comparação des
@@ -764,7 +836,9 @@ g5 <- medianas_municipios_eleicoes %>%
 
 graficos <- plot_grid(g1, g2, g3, g4, g5)
 
-plot_grid(titulo, graficos, ncol = 1, rel_heights = c(0.15, 1))
+# plot_grid(titulo, graficos, ncol = 1, rel_heights = c(0.15, 1))
+graficos
+
 rm(medianas_municipios_eleicoes, titulo, graficos, g1, g2, g3, g4, g5)
 ```
 
@@ -791,28 +865,87 @@ Vamos estimar o valor adicional recebido via emendas parlamentares individuaispe
 -   Note que, quando o modelo inclui a running variable, é sua versão centralizada (votos_razao_pp_centr), porque isso evita que o intercepto tenha valores sem sentido (como valores empenhados negativos).
 
 ```{r}
-# Duas regressões lineares com controle de razão de votos do PP
+# Duas regressões lineares sem controles de município
 regs_lineares <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr, data = dt_individuais)
 
-# Duas regressões com linearidade flexibilizada e controle de razão de votos do PP
-regs_flexiveis <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_individuais)
-
-# Duas regressões lineares com controles
+# Duas regressões lineares com controles de município
 regs_lineares_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_individuais)
 
-# Duas regressões com linearidade flexibilizada e controles
+# Duas regressões quadráticas sem controles de município
+regs_flexiveis <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_individuais)
+
+# Duas regressões quadráticas com controles de município
 regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_individuais)
 
+
 # Resultados
-modelsummary(list(
-    "Duas regressões lineares" = regs_lineares,
-    "Duas regressões não lineares" = regs_flexiveis,
-    "Duas regressões lineares com controles" = regs_lineares_controles,
-    "Duas regressões não lineares com controles" = regs_flexiveis_controles
-  ),
-  statistic = NULL, stars = T, gof_omit = "R2|AIC|BIC|RMSE",
-  output = "Resultados/ValorEmpenhadoPerCapitaIndividuais.png"
+## Completo
+nomes_variaveis <- c(
+  "votos_razao_pp_centr_sq" = "Razão de votos do PP ao quadrado",
+  "votos_razao_pp_centr" = "Razão de votos do PP",
+  "vitoria_pp" = "Prefeito do PP"
 )
+linhas_adicionais <- tribble(~variavel, ~linear, ~linear_controles, ~quad, ~quad_controles,
+                  'Forma funcional', "Linear", "Linear", "Quadrática", "Quadrática",
+                  'Controles municipais', "Não", "Sim", "Não", "Sim")
+modelsummary(list(
+    "Linear sem controles" = regs_lineares,
+    "Linear com controles" = regs_lineares_controles,
+    "Quadrático sem controles" = regs_flexiveis,
+    "Quadrático com controles" = regs_flexiveis_controles
+  ),
+  statistic = NULL,
+  stars = T,
+  gof_omit = "R2|AIC|BIC|RMSE",
+  coef_rename = nomes_variaveis,
+  coef_omit = 5:12,
+  add_rows = linhas_adicionais,
+  output = "Resultados/ValorEmpenhadoPerCapitaIndividuaisFinal.png"
+)
+
+## Linear
+nomes_variaveis <- c(
+  "votos_razao_pp_centr" = "Razão de votos do PP",
+  "vitoria_pp" = "Prefeito do PP"
+)
+linhas_adicionais <- tribble(~variavel, ~linear, ~linear_controles,
+                  'Forma funcional', "Linear", "Linear",
+                  'Controles municipais', "Não", "Sim")
+modelsummary(list(
+    "Linear sem controles" = regs_lineares,
+    "Linear com controles" = regs_lineares_controles
+  ),
+  statistic = NULL,
+  stars = T,
+  gof_omit = "R2|AIC|BIC|RMSE",
+  coef_rename = nomes_variaveis,
+  coef_omit = 5:12,
+  add_rows = linhas_adicionais,
+  output = "Resultados/ValorEmpenhadoPerCapitaIndividuaisLinear.png"
+)
+
+## Quadrático
+nomes_variaveis <- c(
+  "votos_razao_pp_centr_sq" = "Razão de votos do PP ao quadrado",
+  "votos_razao_pp_centr" = "Razão de votos do PP",
+  "vitoria_pp" = "Prefeito do PP"
+)
+linhas_adicionais <- tribble(~variavel, ~quad, ~quad_controles,
+                  'Forma funcional', "Quadrática", "Quadrática",
+                  'Controles municipais', "Não", "Sim")
+modelsummary(list(
+    "Quadrático sem controles" = regs_flexiveis,
+    "Quadrático com controles" = regs_flexiveis_controles
+  ),
+  statistic = NULL,
+  stars = T,
+  gof_omit = "R2|AIC|BIC|RMSE",
+  coef_rename = nomes_variaveis,
+  coef_omit = 7:14,
+  add_rows = linhas_adicionais,
+  output = "Resultados/ValorEmpenhadoPerCapitaIndividuaisQuad.png"
+)
+
 ```
 
 # 4) Teste de heterogeneidade

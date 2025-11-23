@@ -242,6 +242,7 @@ Políticas Sociais}
 \FunctionTok{library}\NormalTok{(basedosdados) }\CommentTok{\# para obtenção dos dados}
 \FunctionTok{library}\NormalTok{(dplyr) }\CommentTok{\# para transformação dos dados}
 \FunctionTok{library}\NormalTok{(data.table) }\CommentTok{\# para transformação dos dados}
+\FunctionTok{library}\NormalTok{(tibble) }\CommentTok{\# para transformação dos dados}
 \FunctionTok{library}\NormalTok{(janitor) }\CommentTok{\# para transformação dos dados}
 \FunctionTok{library}\NormalTok{(ggplot2) }\CommentTok{\# para visualização dos dados}
 \FunctionTok{library}\NormalTok{(cowplot) }\CommentTok{\# para visualização dos dados (plotá{-}los lado a lado)}
@@ -981,6 +982,7 @@ municipais}\label{caracteruxedsticas-municipais-1}
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{\# Linear}
 \NormalTok{g\_pop }\OtherTok{\textless{}{-}}\NormalTok{ dt\_todas[pop }\SpecialCharTok{\%between\%} \FunctionTok{quantile}\NormalTok{(pop, }\FunctionTok{c}\NormalTok{(.}\DecValTok{02}\NormalTok{, .}\DecValTok{99}\NormalTok{), }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)] }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ votos\_razao\_pp, }\AttributeTok{y =}\NormalTok{ pop, }\AttributeTok{color =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{shape =} \DecValTok{21}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
@@ -1035,16 +1037,75 @@ municipais}\label{caracteruxedsticas-municipais-1}
 
 \includegraphics{estimacao_principal_brasil_20251122_files/figure-pdf/grafico_caracteristicas_municipais_por_razao_votos_pp-1.pdf}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Quadrático}
+\NormalTok{g\_pop }\OtherTok{\textless{}{-}}\NormalTok{ dt\_todas[pop }\SpecialCharTok{\%between\%} \FunctionTok{quantile}\NormalTok{(pop, }\FunctionTok{c}\NormalTok{(.}\DecValTok{02}\NormalTok{, .}\DecValTok{99}\NormalTok{), }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)] }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ votos\_razao\_pp, }\AttributeTok{y =}\NormalTok{ pop, }\AttributeTok{color =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{shape =} \DecValTok{21}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{stat\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =}\NormalTok{ F, }\AttributeTok{formula =}\NormalTok{ y }\SpecialCharTok{\textasciitilde{}} \FunctionTok{poly}\NormalTok{(x, }\DecValTok{2}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"População"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
+
+\NormalTok{g\_densidade\_demografica }\OtherTok{\textless{}{-}}\NormalTok{ dt\_todas[densidade\_demografica }\SpecialCharTok{\%between\%} \FunctionTok{quantile}\NormalTok{(densidade\_demografica, }\FunctionTok{c}\NormalTok{(.}\DecValTok{02}\NormalTok{, .}\DecValTok{99}\NormalTok{), }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)] }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ votos\_razao\_pp, }\AttributeTok{y =}\NormalTok{ densidade\_demografica, }\AttributeTok{color =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{shape =} \DecValTok{21}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{stat\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =}\NormalTok{ F, }\AttributeTok{formula =}\NormalTok{ y }\SpecialCharTok{\textasciitilde{}} \FunctionTok{poly}\NormalTok{(x, }\DecValTok{2}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"Densidade}\SpecialCharTok{\textbackslash{}n}\StringTok{demográfica"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
+
+\NormalTok{g\_PIBpc }\OtherTok{\textless{}{-}}\NormalTok{ dt\_todas[PIBpc }\SpecialCharTok{\%between\%} \FunctionTok{quantile}\NormalTok{(PIBpc, }\FunctionTok{c}\NormalTok{(.}\DecValTok{02}\NormalTok{, .}\DecValTok{99}\NormalTok{), }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)] }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ votos\_razao\_pp, }\AttributeTok{y =}\NormalTok{ PIBpc, }\AttributeTok{color =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{shape =} \DecValTok{21}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{stat\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =}\NormalTok{ F, }\AttributeTok{formula =}\NormalTok{ y }\SpecialCharTok{\textasciitilde{}} \FunctionTok{poly}\NormalTok{(x, }\DecValTok{2}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"PIB per capita"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
+
+\NormalTok{g\_taxa\_escolarizacao }\OtherTok{\textless{}{-}}\NormalTok{ dt\_todas[taxa\_escolarizacao }\SpecialCharTok{\%between\%} \FunctionTok{quantile}\NormalTok{(taxa\_escolarizacao, }\FunctionTok{c}\NormalTok{(.}\DecValTok{02}\NormalTok{, .}\DecValTok{99}\NormalTok{), }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)] }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ votos\_razao\_pp, }\AttributeTok{y =}\NormalTok{ taxa\_escolarizacao, }\AttributeTok{color =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{shape =} \DecValTok{21}\NormalTok{, }\AttributeTok{size =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{stat\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =}\NormalTok{ F, }\AttributeTok{formula =}\NormalTok{ y }\SpecialCharTok{\textasciitilde{}} \FunctionTok{poly}\NormalTok{(x, }\DecValTok{2}\NormalTok{)) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"Taxa de}\SpecialCharTok{\textbackslash{}n}\StringTok{escolarização"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
+
+\FunctionTok{plot\_grid}\NormalTok{(g\_pop, g\_densidade\_demografica, g\_PIBpc, g\_taxa\_escolarizacao, }\AttributeTok{ncol =} \DecValTok{2}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{estimacao_principal_brasil_20251122_files/figure-pdf/grafico_caracteristicas_municipais_por_razao_votos_pp-2.pdf}
+
 \subsubsection{\texorpdfstring{2.2.1) Valor empenhado \emph{per capita}
 de emendas
 parlamentares}{2.2.1) Valor empenhado per capita de emendas parlamentares}}\label{valor-empenhado-per-capita-de-emendas-parlamentares}
 
 \begin{Shaded}
 \begin{Highlighting}[]
+\CommentTok{\# Linear}
 \NormalTok{dt\_individuais[valor\_empenhado\_ipca\_pc }\SpecialCharTok{\%between\%} \FunctionTok{quantile}\NormalTok{(valor\_empenhado\_ipca\_pc, }\FunctionTok{c}\NormalTok{(.}\DecValTok{02}\NormalTok{, .}\DecValTok{99}\NormalTok{), }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)] }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ votos\_razao\_pp, }\AttributeTok{y =}\NormalTok{ valor\_empenhado\_ipca\_pc, }\AttributeTok{color =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{shape =} \DecValTok{21}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{stat\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{se =}\NormalTok{ F) }\SpecialCharTok{+} \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{stat\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{formula =}\NormalTok{ y }\SpecialCharTok{\textasciitilde{}}\NormalTok{ x, }\AttributeTok{se =}\NormalTok{ F) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
   \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
@@ -1055,6 +1116,25 @@ parlamentares}{2.2.1) Valor empenhado per capita de emendas parlamentares}}\labe
 \end{Shaded}
 
 \includegraphics{estimacao_principal_brasil_20251122_files/figure-pdf/grafico_valor_empenhado_por_razao_votos_pp-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Quadrático}
+\NormalTok{dt\_individuais[valor\_empenhado\_ipca\_pc }\SpecialCharTok{\%between\%} \FunctionTok{quantile}\NormalTok{(valor\_empenhado\_ipca\_pc, }\FunctionTok{c}\NormalTok{(.}\DecValTok{02}\NormalTok{, .}\DecValTok{99}\NormalTok{), }\AttributeTok{na.rm =} \ConstantTok{TRUE}\NormalTok{)] }\SpecialCharTok{\%\textgreater{}\%}
+  \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{x =}\NormalTok{ votos\_razao\_pp, }\AttributeTok{y =}\NormalTok{ valor\_empenhado\_ipca\_pc, }\AttributeTok{color =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
+  \FunctionTok{geom\_point}\NormalTok{(}\AttributeTok{shape =} \DecValTok{21}\NormalTok{, }\AttributeTok{color =} \StringTok{"black"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{stat\_smooth}\NormalTok{(}\AttributeTok{method =} \StringTok{"lm"}\NormalTok{, }\AttributeTok{formula =}\NormalTok{ y }\SpecialCharTok{\textasciitilde{}} \FunctionTok{poly}\NormalTok{(x, }\DecValTok{2}\NormalTok{), }\AttributeTok{se =}\NormalTok{ F) }\SpecialCharTok{+}
+  \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
+       \AttributeTok{y =} \StringTok{"Valor empenhado per capita"}\NormalTok{,}
+       \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{estimacao_principal_brasil_20251122_files/figure-pdf/grafico_valor_empenhado_por_razao_votos_pp-2.pdf}
 
 \subsection{2.2) Comparação entre tratados e
 controles}\label{comparauxe7uxe3o-entre-tratados-e-controles}
@@ -1176,7 +1256,8 @@ municipais}\label{caracteruxedsticas-municipais-2}
 
 \NormalTok{graficos }\OtherTok{\textless{}{-}} \FunctionTok{plot\_grid}\NormalTok{(g1, g2, g3, g4, g5)}
 
-\FunctionTok{plot\_grid}\NormalTok{(titulo, graficos, }\AttributeTok{ncol =} \DecValTok{1}\NormalTok{, }\AttributeTok{rel\_heights =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.15}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\CommentTok{\# plot\_grid(graficos, ncol = 1, rel\_heights = c(0.15, 1))}
+\NormalTok{graficos}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1262,7 +1343,8 @@ municipais}\label{caracteruxedsticas-municipais-2}
 
 \NormalTok{graficos }\OtherTok{\textless{}{-}} \FunctionTok{plot\_grid}\NormalTok{(g1, g2, g3, g4, g5)}
 
-\FunctionTok{plot\_grid}\NormalTok{(titulo, graficos, }\AttributeTok{ncol =} \DecValTok{1}\NormalTok{, }\AttributeTok{rel\_heights =} \FunctionTok{c}\NormalTok{(}\FloatTok{0.15}\NormalTok{, }\DecValTok{1}\NormalTok{))}
+\CommentTok{\# plot\_grid(titulo, graficos, ncol = 1, rel\_heights = c(0.15, 1))}
+\NormalTok{graficos}
 \end{Highlighting}
 \end{Shaded}
 
@@ -1325,27 +1407,85 @@ por pouco, usando alguns modelos diferentes.
 
 \begin{Shaded}
 \begin{Highlighting}[]
-\CommentTok{\# Duas regressões lineares com controle de razão de votos do PP}
+\CommentTok{\# Duas regressões lineares sem controles de município}
 \NormalTok{regs\_lineares }\OtherTok{\textless{}{-}} \FunctionTok{lm\_robust}\NormalTok{(valor\_empenhado\_ipca\_pc }\SpecialCharTok{\textasciitilde{}}\NormalTok{ vitoria\_pp}\SpecialCharTok{*}\NormalTok{votos\_razao\_pp\_centr, }\AttributeTok{data =}\NormalTok{ dt\_individuais)}
 
-\CommentTok{\# Duas regressões com linearidade flexibilizada e controle de razão de votos do PP}
-\NormalTok{regs\_flexiveis }\OtherTok{\textless{}{-}} \FunctionTok{lm\_robust}\NormalTok{(valor\_empenhado\_ipca\_pc }\SpecialCharTok{\textasciitilde{}}\NormalTok{ vitoria\_pp}\SpecialCharTok{*}\NormalTok{votos\_razao\_pp\_centr }\SpecialCharTok{+}\NormalTok{ vitoria\_pp}\SpecialCharTok{*}\NormalTok{votos\_razao\_pp\_centr\_sq, }\AttributeTok{data =}\NormalTok{ dt\_individuais)}
-
-\CommentTok{\# Duas regressões lineares com controles}
+\CommentTok{\# Duas regressões lineares com controles de município}
 \NormalTok{regs\_lineares\_controles }\OtherTok{\textless{}{-}} \FunctionTok{lm\_robust}\NormalTok{(valor\_empenhado\_ipca\_pc }\SpecialCharTok{\textasciitilde{}}\NormalTok{ vitoria\_pp}\SpecialCharTok{*}\NormalTok{votos\_razao\_pp\_centr }\SpecialCharTok{+}\NormalTok{ regiao }\SpecialCharTok{+}\NormalTok{ pop }\SpecialCharTok{+}\NormalTok{ densidade\_demografica }\SpecialCharTok{+}\NormalTok{ PIBpc }\SpecialCharTok{+}\NormalTok{ taxa\_escolarizacao, }\AttributeTok{data =}\NormalTok{ dt\_individuais)}
 
-\CommentTok{\# Duas regressões com linearidade flexibilizada e controles}
+\CommentTok{\# Duas regressões quadráticas sem controles de município}
+\NormalTok{regs\_flexiveis }\OtherTok{\textless{}{-}} \FunctionTok{lm\_robust}\NormalTok{(valor\_empenhado\_ipca\_pc }\SpecialCharTok{\textasciitilde{}}\NormalTok{ vitoria\_pp}\SpecialCharTok{*}\NormalTok{votos\_razao\_pp\_centr }\SpecialCharTok{+}\NormalTok{ vitoria\_pp}\SpecialCharTok{*}\NormalTok{votos\_razao\_pp\_centr\_sq, }\AttributeTok{data =}\NormalTok{ dt\_individuais)}
+
+\CommentTok{\# Duas regressões quadráticas com controles de município}
 \NormalTok{regs\_flexiveis\_controles }\OtherTok{\textless{}{-}} \FunctionTok{lm\_robust}\NormalTok{(valor\_empenhado\_ipca\_pc }\SpecialCharTok{\textasciitilde{}}\NormalTok{ vitoria\_pp}\SpecialCharTok{*}\NormalTok{votos\_razao\_pp\_centr }\SpecialCharTok{+}\NormalTok{ vitoria\_pp}\SpecialCharTok{*}\NormalTok{votos\_razao\_pp\_centr\_sq }\SpecialCharTok{+}\NormalTok{ regiao }\SpecialCharTok{+}\NormalTok{ pop }\SpecialCharTok{+}\NormalTok{ densidade\_demografica }\SpecialCharTok{+}\NormalTok{ PIBpc }\SpecialCharTok{+}\NormalTok{ taxa\_escolarizacao, }\AttributeTok{data =}\NormalTok{ dt\_individuais)}
 
+
 \CommentTok{\# Resultados}
+\DocumentationTok{\#\# Completo}
+\NormalTok{nomes\_variaveis }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
+  \StringTok{"votos\_razao\_pp\_centr\_sq"} \OtherTok{=} \StringTok{"Razão de votos do PP ao quadrado"}\NormalTok{,}
+  \StringTok{"votos\_razao\_pp\_centr"} \OtherTok{=} \StringTok{"Razão de votos do PP"}\NormalTok{,}
+  \StringTok{"vitoria\_pp"} \OtherTok{=} \StringTok{"Prefeito do PP"}
+\NormalTok{)}
+\NormalTok{linhas\_adicionais }\OtherTok{\textless{}{-}} \FunctionTok{tribble}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{variavel, }\SpecialCharTok{\textasciitilde{}}\NormalTok{linear, }\SpecialCharTok{\textasciitilde{}}\NormalTok{linear\_controles, }\SpecialCharTok{\textasciitilde{}}\NormalTok{quad, }\SpecialCharTok{\textasciitilde{}}\NormalTok{quad\_controles,}
+                  \StringTok{\textquotesingle{}Forma funcional\textquotesingle{}}\NormalTok{, }\StringTok{"Linear"}\NormalTok{, }\StringTok{"Linear"}\NormalTok{, }\StringTok{"Quadrática"}\NormalTok{, }\StringTok{"Quadrática"}\NormalTok{,}
+                  \StringTok{\textquotesingle{}Controles municipais\textquotesingle{}}\NormalTok{, }\StringTok{"Não"}\NormalTok{, }\StringTok{"Sim"}\NormalTok{, }\StringTok{"Não"}\NormalTok{, }\StringTok{"Sim"}\NormalTok{)}
 \FunctionTok{modelsummary}\NormalTok{(}\FunctionTok{list}\NormalTok{(}
-    \StringTok{"Duas regressões lineares"} \OtherTok{=}\NormalTok{ regs\_lineares,}
-    \StringTok{"Duas regressões não lineares"} \OtherTok{=}\NormalTok{ regs\_flexiveis,}
-    \StringTok{"Duas regressões lineares com controles"} \OtherTok{=}\NormalTok{ regs\_lineares\_controles,}
-    \StringTok{"Duas regressões não lineares com controles"} \OtherTok{=}\NormalTok{ regs\_flexiveis\_controles}
+    \StringTok{"Linear sem controles"} \OtherTok{=}\NormalTok{ regs\_lineares,}
+    \StringTok{"Linear com controles"} \OtherTok{=}\NormalTok{ regs\_lineares\_controles,}
+    \StringTok{"Quadrático sem controles"} \OtherTok{=}\NormalTok{ regs\_flexiveis,}
+    \StringTok{"Quadrático com controles"} \OtherTok{=}\NormalTok{ regs\_flexiveis\_controles}
 \NormalTok{  ),}
-  \AttributeTok{statistic =} \ConstantTok{NULL}\NormalTok{, }\AttributeTok{stars =}\NormalTok{ T, }\AttributeTok{gof\_omit =} \StringTok{"R2|AIC|BIC|RMSE"}\NormalTok{,}
-  \AttributeTok{output =} \StringTok{"Resultados/ValorEmpenhadoPerCapitaIndividuais.png"}
+  \AttributeTok{statistic =} \ConstantTok{NULL}\NormalTok{,}
+  \AttributeTok{stars =}\NormalTok{ T,}
+  \AttributeTok{gof\_omit =} \StringTok{"R2|AIC|BIC|RMSE"}\NormalTok{,}
+  \AttributeTok{coef\_rename =}\NormalTok{ nomes\_variaveis,}
+  \AttributeTok{coef\_omit =} \DecValTok{5}\SpecialCharTok{:}\DecValTok{12}\NormalTok{,}
+  \AttributeTok{add\_rows =}\NormalTok{ linhas\_adicionais,}
+  \AttributeTok{output =} \StringTok{"Resultados/ValorEmpenhadoPerCapitaIndividuaisFinal.png"}
+\NormalTok{)}
+
+\DocumentationTok{\#\# Linear}
+\NormalTok{nomes\_variaveis }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
+  \StringTok{"votos\_razao\_pp\_centr"} \OtherTok{=} \StringTok{"Razão de votos do PP"}\NormalTok{,}
+  \StringTok{"vitoria\_pp"} \OtherTok{=} \StringTok{"Prefeito do PP"}
+\NormalTok{)}
+\NormalTok{linhas\_adicionais }\OtherTok{\textless{}{-}} \FunctionTok{tribble}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{variavel, }\SpecialCharTok{\textasciitilde{}}\NormalTok{linear, }\SpecialCharTok{\textasciitilde{}}\NormalTok{linear\_controles,}
+                  \StringTok{\textquotesingle{}Forma funcional\textquotesingle{}}\NormalTok{, }\StringTok{"Linear"}\NormalTok{, }\StringTok{"Linear"}\NormalTok{,}
+                  \StringTok{\textquotesingle{}Controles municipais\textquotesingle{}}\NormalTok{, }\StringTok{"Não"}\NormalTok{, }\StringTok{"Sim"}\NormalTok{)}
+\FunctionTok{modelsummary}\NormalTok{(}\FunctionTok{list}\NormalTok{(}
+    \StringTok{"Linear sem controles"} \OtherTok{=}\NormalTok{ regs\_lineares,}
+    \StringTok{"Linear com controles"} \OtherTok{=}\NormalTok{ regs\_lineares\_controles}
+\NormalTok{  ),}
+  \AttributeTok{statistic =} \ConstantTok{NULL}\NormalTok{,}
+  \AttributeTok{stars =}\NormalTok{ T,}
+  \AttributeTok{gof\_omit =} \StringTok{"R2|AIC|BIC|RMSE"}\NormalTok{,}
+  \AttributeTok{coef\_rename =}\NormalTok{ nomes\_variaveis,}
+  \AttributeTok{coef\_omit =} \DecValTok{5}\SpecialCharTok{:}\DecValTok{12}\NormalTok{,}
+  \AttributeTok{add\_rows =}\NormalTok{ linhas\_adicionais,}
+  \AttributeTok{output =} \StringTok{"Resultados/ValorEmpenhadoPerCapitaIndividuaisLinear.png"}
+\NormalTok{)}
+
+\DocumentationTok{\#\# Quadrático}
+\NormalTok{nomes\_variaveis }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
+  \StringTok{"votos\_razao\_pp\_centr\_sq"} \OtherTok{=} \StringTok{"Razão de votos do PP ao quadrado"}\NormalTok{,}
+  \StringTok{"votos\_razao\_pp\_centr"} \OtherTok{=} \StringTok{"Razão de votos do PP"}\NormalTok{,}
+  \StringTok{"vitoria\_pp"} \OtherTok{=} \StringTok{"Prefeito do PP"}
+\NormalTok{)}
+\NormalTok{linhas\_adicionais }\OtherTok{\textless{}{-}} \FunctionTok{tribble}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{variavel, }\SpecialCharTok{\textasciitilde{}}\NormalTok{quad, }\SpecialCharTok{\textasciitilde{}}\NormalTok{quad\_controles,}
+                  \StringTok{\textquotesingle{}Forma funcional\textquotesingle{}}\NormalTok{, }\StringTok{"Quadrática"}\NormalTok{, }\StringTok{"Quadrática"}\NormalTok{,}
+                  \StringTok{\textquotesingle{}Controles municipais\textquotesingle{}}\NormalTok{, }\StringTok{"Não"}\NormalTok{, }\StringTok{"Sim"}\NormalTok{)}
+\FunctionTok{modelsummary}\NormalTok{(}\FunctionTok{list}\NormalTok{(}
+    \StringTok{"Quadrático sem controles"} \OtherTok{=}\NormalTok{ regs\_flexiveis,}
+    \StringTok{"Quadrático com controles"} \OtherTok{=}\NormalTok{ regs\_flexiveis\_controles}
+\NormalTok{  ),}
+  \AttributeTok{statistic =} \ConstantTok{NULL}\NormalTok{,}
+  \AttributeTok{stars =}\NormalTok{ T,}
+  \AttributeTok{gof\_omit =} \StringTok{"R2|AIC|BIC|RMSE"}\NormalTok{,}
+  \AttributeTok{coef\_rename =}\NormalTok{ nomes\_variaveis,}
+  \AttributeTok{coef\_omit =} \DecValTok{7}\SpecialCharTok{:}\DecValTok{14}\NormalTok{,}
+  \AttributeTok{add\_rows =}\NormalTok{ linhas\_adicionais,}
+  \AttributeTok{output =} \StringTok{"Resultados/ValorEmpenhadoPerCapitaIndividuaisQuad.png"}
 \NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
