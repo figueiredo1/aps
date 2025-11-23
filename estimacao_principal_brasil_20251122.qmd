@@ -33,8 +33,14 @@ library(janitor) # para transformação dos dados
 library(ggplot2) # para visualização dos dados
 library(cowplot) # para visualização dos dados (plotá-los lado a lado)
 library(scales) # para visualização dos dados (fazer eixos bonito)
+library(showtext) # para usar outras fontes
 library(estimatr) # para modelagem
 library(modelsummary) # para visualização de resultados dos modelos
+
+# Carregar fonte Computer Modern
+font_add("CMU Serif", "Fontes/cmunrm.ttf")
+showtext_auto()
+options(modelsummary_latex = "CMU Serif")
 ```
 
 # 1) Coleta e junção de dados
@@ -531,7 +537,7 @@ g_pop <- dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
   scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() + guides(color = "none") +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "População",
        x = "Razão de votos do PP")
@@ -543,7 +549,7 @@ g_densidade_demografica <- dt_todas[densidade_demografica %between% quantile(den
   scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() + guides(color = "none") +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "Densidade\ndemográfica",
        x = "Razão de votos do PP")
@@ -555,7 +561,7 @@ g_PIBpc <- dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] 
   scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() + guides(color = "none") +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "PIB per capita",
        x = "Razão de votos do PP")
@@ -567,7 +573,7 @@ g_taxa_escolarizacao <- dt_todas[taxa_escolarizacao %between% quantile(taxa_esco
   scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() + guides(color = "none") +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "Taxa de\nescolarização",
        x = "Razão de votos do PP")
@@ -584,7 +590,7 @@ g_pop <- dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
   scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() + guides(color = "none") +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "População",
        x = "Razão de votos do PP")
@@ -596,7 +602,7 @@ g_densidade_demografica <- dt_todas[densidade_demografica %between% quantile(den
   scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() + guides(color = "none") +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "Densidade\ndemográfica",
        x = "Razão de votos do PP")
@@ -608,7 +614,7 @@ g_PIBpc <- dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] 
   scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() + guides(color = "none") +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "PIB per capita",
        x = "Razão de votos do PP")
@@ -620,7 +626,7 @@ g_taxa_escolarizacao <- dt_todas[taxa_escolarizacao %between% quantile(taxa_esco
   scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() + guides(color = "none") +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "Taxa de\nescolarização",
        x = "Razão de votos do PP")
@@ -641,7 +647,7 @@ dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_p
   scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() + guides(color = "none") +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "Valor empenhado per capita",
        x = "Razão de votos do PP")
@@ -654,7 +660,7 @@ dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_p
   scale_color_brewer(palette = "Dark2", direction = -1) +
   geom_vline(xintercept = 0.5, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
-  theme_minimal() + guides(color = "none") +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "Valor empenhado per capita",
        x = "Razão de votos do PP")
@@ -716,12 +722,12 @@ medias_municipios_eleicoes <- dt_municipios_eleicoes[
 # Plotar médias de quem venceu vs. não venceu - formatar
 titulo <- ggplot() + 
   labs(title = "Comparação das médias de características municipais", subtitle = "Fontes dos dados: TSE, IBGE (2021, 2022). Elaboração própria.") +
-  theme_minimal()
+  theme_minimal(base_family = "CMU Serif")
 
 g1 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_pop, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal() + guides(color = "none") +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "População",
        x = "Prefeito do PP?")
@@ -729,7 +735,7 @@ g1 <- medias_municipios_eleicoes %>%
 g2 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_densidade_demografica, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal() +
+  theme_minimal(base_family = "CMU Serif") +
   labs(title = "",
        y = "Densidade\ndemográfica",
        x = "Prefeito do PP?")
@@ -737,7 +743,7 @@ g2 <- medias_municipios_eleicoes %>%
 g3 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_PIBpc, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal() +
+  theme_minimal(base_family = "CMU Serif") +
   labs(title = "",
        y = "PIB per capita",
        x = "Prefeito do PP?")
@@ -745,7 +751,7 @@ g3 <- medias_municipios_eleicoes %>%
 g4 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal() +
+  theme_minimal(base_family = "CMU Serif") +
   labs(title = "",
        y = "Taxa de escolarização",
        x = "Prefeito do PP?")
@@ -753,7 +759,7 @@ g4 <- medias_municipios_eleicoes %>%
 g5 <- medias_municipios_eleicoes %>%
   ggplot(aes(y = media_mortalidade_infantil, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal() +
+  theme_minimal(base_family = "CMU Serif") +
   labs(title = "",
        y = "Mortalidade infantil",
        x = "Prefeito do PP?")
@@ -792,12 +798,12 @@ medianas_municipios_eleicoes <- dt_municipios_eleicoes[
 # Plotar medianas de quem venceu vs. não venceu - formatar
 titulo <- ggplot() + 
   labs(title = "Comparação das medianas de características municipais", subtitle = "Fontes dos dados: TSE (2021), IBGE (2021, 2022). Elaboração própria.") + 
-  theme_minimal()
+  theme_minimal(base_family = "CMU Serif")
 
 g1 <- medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_pop, x = as.factor(vitoria_pp), data = )) +
   geom_col() +
-  theme_minimal() +
+  theme_minimal(base_family = "CMU Serif") +
   labs(title = "",
        y = "População",
        x = "Prefeito do PP?")
@@ -805,7 +811,7 @@ g1 <- medianas_municipios_eleicoes %>%
 g2 <- medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_densidade_demografica, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal() +
+  theme_minimal(base_family = "CMU Serif") +
   labs(title = "",
        y = "Densidade\ndemográfica",
        x = "Prefeito do PP?")
@@ -813,7 +819,7 @@ g2 <- medianas_municipios_eleicoes %>%
 g3 <- medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_PIBpc, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal() +
+  theme_minimal(base_family = "CMU Serif") +
   labs(title = "",
        y = "PIB per capita",
        x = "Prefeito do PP?")
@@ -821,7 +827,7 @@ g3 <- medianas_municipios_eleicoes %>%
 g4 <- medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal() +
+  theme_minimal(base_family = "CMU Serif") +
   labs(title = "",
        y = "Taxa de escolarização",
        x = "Prefeito do PP?")
@@ -829,7 +835,7 @@ g4 <- medianas_municipios_eleicoes %>%
 g5 <- medianas_municipios_eleicoes %>%
   ggplot(aes(y = mediana_mortalidade_infantil, x = as.factor(vitoria_pp))) +
   geom_col() +
-  theme_minimal() +
+  theme_minimal(base_family = "CMU Serif") +
   labs(title = "",
        y = "Mortalidade infantil",
        x = "Prefeito do PP?")
@@ -955,31 +961,41 @@ Vamos repetir a estimação por região, mas precisamos prestar atenção no nú
 ## 4.1) Norte
 
 ```{r}
+# Filtrar base de dados pra região Norte
 
+# Repetir estimação
 ```
 
 ## 4.2) Nordeste
 
 ```{r}
+# Filtrar base de dados pra região Nordeste
 
+# Repetir estimação
 ```
 
 ## 4.3) Sudeste
 
 ```{r}
+# Filtrar base de dados pra região Sudeste
 
+# Repetir estimação
 ```
 
 ## 4.4) Sul
 
 ```{r}
+# Filtrar base de dados pra região Sul
 
+# Repetir estimação
 ```
 
 ## 4.5) Centro-Oeste
 
 ```{r}
+# Filtrar base de dados pra região Centro-Oeste
 
+# Repetir estimação
 ```
 
 # 5) Teste placebo

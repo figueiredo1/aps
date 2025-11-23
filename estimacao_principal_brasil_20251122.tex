@@ -247,8 +247,14 @@ Políticas Sociais}
 \FunctionTok{library}\NormalTok{(ggplot2) }\CommentTok{\# para visualização dos dados}
 \FunctionTok{library}\NormalTok{(cowplot) }\CommentTok{\# para visualização dos dados (plotá{-}los lado a lado)}
 \FunctionTok{library}\NormalTok{(scales) }\CommentTok{\# para visualização dos dados (fazer eixos bonito)}
+\FunctionTok{library}\NormalTok{(showtext) }\CommentTok{\# para usar outras fontes}
 \FunctionTok{library}\NormalTok{(estimatr) }\CommentTok{\# para modelagem}
 \FunctionTok{library}\NormalTok{(modelsummary) }\CommentTok{\# para visualização de resultados dos modelos}
+
+\CommentTok{\# Carregar fonte Computer Modern}
+\FunctionTok{font\_add}\NormalTok{(}\StringTok{"CMU Serif"}\NormalTok{, }\StringTok{"Fontes/cmunrm.ttf"}\NormalTok{)}
+\FunctionTok{showtext\_auto}\NormalTok{()}
+\FunctionTok{options}\NormalTok{(}\AttributeTok{modelsummary\_latex =} \StringTok{"CMU Serif"}\NormalTok{)}
 \end{Highlighting}
 \end{Shaded}
 
@@ -990,7 +996,7 @@ municipais}\label{caracteruxedsticas-municipais-1}
   \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"População"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
@@ -1002,7 +1008,7 @@ municipais}\label{caracteruxedsticas-municipais-1}
   \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Densidade}\SpecialCharTok{\textbackslash{}n}\StringTok{demográfica"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
@@ -1014,7 +1020,7 @@ municipais}\label{caracteruxedsticas-municipais-1}
   \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"PIB per capita"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
@@ -1026,7 +1032,7 @@ municipais}\label{caracteruxedsticas-municipais-1}
   \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Taxa de}\SpecialCharTok{\textbackslash{}n}\StringTok{escolarização"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
@@ -1047,7 +1053,7 @@ municipais}\label{caracteruxedsticas-municipais-1}
   \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"População"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
@@ -1059,7 +1065,7 @@ municipais}\label{caracteruxedsticas-municipais-1}
   \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Densidade}\SpecialCharTok{\textbackslash{}n}\StringTok{demográfica"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
@@ -1071,7 +1077,7 @@ municipais}\label{caracteruxedsticas-municipais-1}
   \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"PIB per capita"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
@@ -1083,7 +1089,7 @@ municipais}\label{caracteruxedsticas-municipais-1}
   \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Taxa de}\SpecialCharTok{\textbackslash{}n}\StringTok{escolarização"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
@@ -1108,7 +1114,7 @@ parlamentares}{2.2.1) Valor empenhado per capita de emendas parlamentares}}\labe
   \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Valor empenhado per capita"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
@@ -1127,7 +1133,7 @@ parlamentares}{2.2.1) Valor empenhado per capita de emendas parlamentares}}\labe
   \FunctionTok{scale\_color\_brewer}\NormalTok{(}\AttributeTok{palette =} \StringTok{"Dark2"}\NormalTok{, }\AttributeTok{direction =} \SpecialCharTok{{-}}\DecValTok{1}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{geom\_vline}\NormalTok{(}\AttributeTok{xintercept =} \FloatTok{0.5}\NormalTok{, }\AttributeTok{linetype =} \StringTok{"dashed"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{scale\_y\_continuous}\NormalTok{(}\AttributeTok{labels =} \FunctionTok{label\_number}\NormalTok{()) }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Valor empenhado per capita"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Razão de votos do PP"}\NormalTok{)}
@@ -1212,12 +1218,12 @@ municipais}\label{caracteruxedsticas-municipais-2}
 \CommentTok{\# Plotar médias de quem venceu vs. não venceu {-} formatar}
 \NormalTok{titulo }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{() }\SpecialCharTok{+} 
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Comparação das médias de características municipais"}\NormalTok{, }\AttributeTok{subtitle =} \StringTok{"Fontes dos dados: TSE, IBGE (2021, 2022). Elaboração própria."}\NormalTok{) }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{()}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{)}
 
 \NormalTok{g1 }\OtherTok{\textless{}{-}}\NormalTok{ medias\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ media\_pop, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+} \FunctionTok{guides}\NormalTok{(}\AttributeTok{color =} \StringTok{"none"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"População"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Prefeito do PP?"}\NormalTok{)}
@@ -1225,7 +1231,7 @@ municipais}\label{caracteruxedsticas-municipais-2}
 \NormalTok{g2 }\OtherTok{\textless{}{-}}\NormalTok{ medias\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ media\_densidade\_demografica, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Densidade}\SpecialCharTok{\textbackslash{}n}\StringTok{demográfica"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Prefeito do PP?"}\NormalTok{)}
@@ -1233,7 +1239,7 @@ municipais}\label{caracteruxedsticas-municipais-2}
 \NormalTok{g3 }\OtherTok{\textless{}{-}}\NormalTok{ medias\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ media\_PIBpc, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"PIB per capita"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Prefeito do PP?"}\NormalTok{)}
@@ -1241,7 +1247,7 @@ municipais}\label{caracteruxedsticas-municipais-2}
 \NormalTok{g4 }\OtherTok{\textless{}{-}}\NormalTok{ medias\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ media\_taxa\_escolarizacao, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Taxa de escolarização"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Prefeito do PP?"}\NormalTok{)}
@@ -1249,7 +1255,7 @@ municipais}\label{caracteruxedsticas-municipais-2}
 \NormalTok{g5 }\OtherTok{\textless{}{-}}\NormalTok{ medias\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ media\_mortalidade\_infantil, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Mortalidade infantil"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Prefeito do PP?"}\NormalTok{)}
@@ -1299,12 +1305,12 @@ municipais}\label{caracteruxedsticas-municipais-2}
 \CommentTok{\# Plotar medianas de quem venceu vs. não venceu {-} formatar}
 \NormalTok{titulo }\OtherTok{\textless{}{-}} \FunctionTok{ggplot}\NormalTok{() }\SpecialCharTok{+} 
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{"Comparação das medianas de características municipais"}\NormalTok{, }\AttributeTok{subtitle =} \StringTok{"Fontes dos dados: TSE (2021), IBGE (2021, 2022). Elaboração própria."}\NormalTok{) }\SpecialCharTok{+} 
-  \FunctionTok{theme\_minimal}\NormalTok{()}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{)}
 
 \NormalTok{g1 }\OtherTok{\textless{}{-}}\NormalTok{ medianas\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ mediana\_pop, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp), }\AttributeTok{data =}\NormalTok{ )) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"População"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Prefeito do PP?"}\NormalTok{)}
@@ -1312,7 +1318,7 @@ municipais}\label{caracteruxedsticas-municipais-2}
 \NormalTok{g2 }\OtherTok{\textless{}{-}}\NormalTok{ medianas\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ mediana\_densidade\_demografica, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Densidade}\SpecialCharTok{\textbackslash{}n}\StringTok{demográfica"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Prefeito do PP?"}\NormalTok{)}
@@ -1320,7 +1326,7 @@ municipais}\label{caracteruxedsticas-municipais-2}
 \NormalTok{g3 }\OtherTok{\textless{}{-}}\NormalTok{ medianas\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ mediana\_PIBpc, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"PIB per capita"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Prefeito do PP?"}\NormalTok{)}
@@ -1328,7 +1334,7 @@ municipais}\label{caracteruxedsticas-municipais-2}
 \NormalTok{g4 }\OtherTok{\textless{}{-}}\NormalTok{ medianas\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ mediana\_taxa\_escolarizacao, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Taxa de escolarização"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Prefeito do PP?"}\NormalTok{)}
@@ -1336,7 +1342,7 @@ municipais}\label{caracteruxedsticas-municipais-2}
 \NormalTok{g5 }\OtherTok{\textless{}{-}}\NormalTok{ medianas\_municipios\_eleicoes }\SpecialCharTok{\%\textgreater{}\%}
   \FunctionTok{ggplot}\NormalTok{(}\FunctionTok{aes}\NormalTok{(}\AttributeTok{y =}\NormalTok{ mediana\_mortalidade\_infantil, }\AttributeTok{x =} \FunctionTok{as.factor}\NormalTok{(vitoria\_pp))) }\SpecialCharTok{+}
   \FunctionTok{geom\_col}\NormalTok{() }\SpecialCharTok{+}
-  \FunctionTok{theme\_minimal}\NormalTok{() }\SpecialCharTok{+}
+  \FunctionTok{theme\_minimal}\NormalTok{(}\AttributeTok{base\_family =} \StringTok{"CMU Serif"}\NormalTok{) }\SpecialCharTok{+}
   \FunctionTok{labs}\NormalTok{(}\AttributeTok{title =} \StringTok{""}\NormalTok{,}
        \AttributeTok{y =} \StringTok{"Mortalidade infantil"}\NormalTok{,}
        \AttributeTok{x =} \StringTok{"Prefeito do PP?"}\NormalTok{)}
@@ -1497,13 +1503,53 @@ número de observações e de tratados.
 
 \subsection{4.1) Norte}\label{norte}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Filtrar base de dados pra região Norte}
+
+\CommentTok{\# Repetir estimação}
+\end{Highlighting}
+\end{Shaded}
+
 \subsection{4.2) Nordeste}\label{nordeste}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Filtrar base de dados pra região Nordeste}
+
+\CommentTok{\# Repetir estimação}
+\end{Highlighting}
+\end{Shaded}
 
 \subsection{4.3) Sudeste}\label{sudeste}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Filtrar base de dados pra região Sudeste}
+
+\CommentTok{\# Repetir estimação}
+\end{Highlighting}
+\end{Shaded}
+
 \subsection{4.4) Sul}\label{sul}
 
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Filtrar base de dados pra região Sul}
+
+\CommentTok{\# Repetir estimação}
+\end{Highlighting}
+\end{Shaded}
+
 \subsection{4.5) Centro-Oeste}\label{centro-oeste}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\# Filtrar base de dados pra região Centro{-}Oeste}
+
+\CommentTok{\# Repetir estimação}
+\end{Highlighting}
+\end{Shaded}
 
 \section{5) Teste placebo}\label{teste-placebo}
 
