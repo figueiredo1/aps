@@ -20,6 +20,10 @@ warning: false
 
 -   Diferença em relação à versão de 21/11/2025: Filtrei por eleições acirradas só mais tarde para poder fazer os gráficos de (des)continuidades de características e valor empenhado por razão de votos do candidato a prefeito do PP; não analisei as emendas de bancada após constatar que elas são poucas
 
+-   Diferença em relação à versão de 22/11/2025: Escolhi as janelas ótimas segundo o método de Calonico *et al.* em vez de arbitrariamente e coloquei as análises quadráticas como teste de robustez
+
+    -   Note que a janela ótima de modelos lineares e de modelos quadráticos são diferentes!
+
 # 0) Preparativos
 
 ```{r}
@@ -35,6 +39,7 @@ library(cowplot) # para visualização dos dados (plotá-los lado a lado)
 library(scales) # para visualização dos dados (fazer eixos bonito)
 library(showtext) # para usar outras fontes
 library(estimatr) # para modelagem
+library(rdrobust) # para escolher a janela ótima
 library(modelsummary) # para visualização de resultados dos modelos
 
 # Carregar fonte Computer Modern
@@ -530,7 +535,7 @@ Note que filtramos os municípios para os percentis 2 a 99 de cada característi
 
 # Linear
 g_pop <- dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = pop, color = as.factor(vitoria_pp))) +
+  ggplot(aes(x = votos_razao_pp_centr, y = pop, color = as.factor(vitoria_pp))) +
   geom_point(shape = 21, size = 0.5, color = "black") +
   stat_smooth(method = "lm", se = F) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
@@ -539,10 +544,10 @@ g_pop <- dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
   theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "População",
-       x = "Razão de votos do PP")
+       x = "Margem de vitória do PP") + scale_x_continuous(labels = label_percent()) + scale_x_continuous(labels = label_percent())
 
 g_densidade_demografica <- dt_todas[densidade_demografica %between% quantile(densidade_demografica, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = densidade_demografica, color = as.factor(vitoria_pp))) +
+  ggplot(aes(x = votos_razao_pp_centr, y = densidade_demografica, color = as.factor(vitoria_pp))) +
   geom_point(shape = 21, size = 0.5, color = "black") +
   stat_smooth(method = "lm", se = F) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
@@ -551,10 +556,10 @@ g_densidade_demografica <- dt_todas[densidade_demografica %between% quantile(den
   theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "Densidade\ndemográfica",
-       x = "Razão de votos do PP")
+       x = "Margem de vitória do PP") + scale_x_continuous(labels = label_percent())
 
 g_PIBpc <- dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = PIBpc, color = as.factor(vitoria_pp))) +
+  ggplot(aes(x = votos_razao_pp_centr, y = PIBpc, color = as.factor(vitoria_pp))) +
   geom_point(shape = 21, size = 0.5, color = "black") +
   stat_smooth(method = "lm", se = F) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
@@ -563,10 +568,10 @@ g_PIBpc <- dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] 
   theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "PIB per capita",
-       x = "Razão de votos do PP")
+       x = "Margem de vitória do PP") + scale_x_continuous(labels = label_percent())
 
 g_taxa_escolarizacao <- dt_todas[taxa_escolarizacao %between% quantile(taxa_escolarizacao, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = taxa_escolarizacao, color = as.factor(vitoria_pp))) +
+  ggplot(aes(x = votos_razao_pp_centr, y = taxa_escolarizacao, color = as.factor(vitoria_pp))) +
   geom_point(shape = 21, size = 0.5, color = "black") +
   stat_smooth(method = "lm", se = F) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
@@ -575,72 +580,19 @@ g_taxa_escolarizacao <- dt_todas[taxa_escolarizacao %between% quantile(taxa_esco
   theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "Taxa de\nescolarização",
-       x = "Razão de votos do PP")
-
-plot_grid(g_pop, g_densidade_demografica, g_PIBpc, g_taxa_escolarizacao, ncol = 2)
-
-
-
-# Quadrático
-g_pop <- dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = pop, color = as.factor(vitoria_pp))) +
-  geom_point(shape = 21, size = 0.5, color = "black") +
-  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
-  scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
-  scale_y_continuous(labels = label_number()) +
-  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
-  labs(title = "",
-       y = "População",
-       x = "Razão de votos do PP")
-
-g_densidade_demografica <- dt_todas[densidade_demografica %between% quantile(densidade_demografica, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = densidade_demografica, color = as.factor(vitoria_pp))) +
-  geom_point(shape = 21, size = 0.5, color = "black") +
-  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
-  scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
-  scale_y_continuous(labels = label_number()) +
-  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
-  labs(title = "",
-       y = "Densidade\ndemográfica",
-       x = "Razão de votos do PP")
-
-g_PIBpc <- dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = PIBpc, color = as.factor(vitoria_pp))) +
-  geom_point(shape = 21, size = 0.5, color = "black") +
-  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
-  scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
-  scale_y_continuous(labels = label_number()) +
-  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
-  labs(title = "",
-       y = "PIB per capita",
-       x = "Razão de votos do PP")
-
-g_taxa_escolarizacao <- dt_todas[taxa_escolarizacao %between% quantile(taxa_escolarizacao, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = taxa_escolarizacao, color = as.factor(vitoria_pp))) +
-  geom_point(shape = 21, size = 0.5, color = "black") +
-  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
-  scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
-  scale_y_continuous(labels = label_number()) +
-  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
-  labs(title = "",
-       y = "Taxa de\nescolarização",
-       x = "Razão de votos do PP")
+       x = "Margem de vitória do PP") + scale_x_continuous(labels = label_percent())
 
 plot_grid(g_pop, g_densidade_demografica, g_PIBpc, g_taxa_escolarizacao, ncol = 2)
 ```
 
-### 2.2.1) Valor empenhado *per capita* de emendas parlamentares
+### 2.1.2) Valor empenhado *per capita* de emendas parlamentares
 
 ```{r}
 #| label: grafico_valor_empenhado_por_razao_votos_pp
 
 # Linear
 dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_pc, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = valor_empenhado_ipca_pc, color = as.factor(vitoria_pp))) +
+  ggplot(aes(x = votos_razao_pp_centr, y = valor_empenhado_ipca_pc, color = as.factor(vitoria_pp))) +
   geom_point(shape = 21, color = "black") +
   stat_smooth(method = "lm", formula = y ~ x, se = F) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
@@ -649,34 +601,52 @@ dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_p
   theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
   labs(title = "",
        y = "Valor empenhado per capita",
-       x = "Razão de votos do PP")
-
-# Quadrático
-dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_pc, c(.02, .99), na.rm = TRUE)] %>%
-  ggplot(aes(x = votos_razao_pp, y = valor_empenhado_ipca_pc, color = as.factor(vitoria_pp))) +
-  geom_point(shape = 21, color = "black") +
-  stat_smooth(method = "lm", formula = y ~ poly(x, 2), se = F) +
-  scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
-  scale_y_continuous(labels = label_number()) +
-  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
-  labs(title = "",
-       y = "Valor empenhado per capita",
-       x = "Razão de votos do PP")
+       x = "Margem de vitória do PP") + scale_x_continuous(labels = label_percent())
 ```
 
 ## 2.2) Comparação entre tratados e controles
 
-### 2.2.0) Filtrar bases de dados
+### 2.2.0) Obter janela ótima e filtrar bases de dados
 
 Agora, vamos mostrar que os municípios em que o candidato do PP ganhou vs. perdeu por pouco de fato são semelhantes. Para isso, vamos filtrar as bases de dados por eleições acirradas.
 
 ```{r}
-# Filtrar bases de dados para municípios em que a margem de vitória foi de 5% ou menos
-dt_todas <- dt_todas[votos_razao_pp >= 0.45 & votos_razao_pp <= 0.55]
-dt_individuais <- dt_individuais[votos_razao_pp >= 0.45 & votos_razao_pp <= 0.55]
-dt_bancada <- dt_bancada[votos_razao_pp >= 0.45 & votos_razao_pp <= 0.55]
-dt_relator <- dt_relator[votos_razao_pp >= 0.45 & votos_razao_pp <= 0.55]
+# Guardar bases de dados completas
+dt_todas_completa <- dt_todas
+dt_individuais_completa <- dt_individuais
+dt_bancada_completa <- dt_bancada
+dt_relator_completa <- dt_relator
+
+# Obter janela ótima
+## Para modelo linear
+### Sem covariadas
+janela_outra <- rdbwselect(
+  x = dt_individuais$votos_razao_pp_centr,
+  y = dt_individuais$valor_empenhado_ipca_pc,
+  p = 1
+)
+janela_outra$bws
+### Com covariadas
+covariadas <- dt_individuais[, .(pop, densidade_demografica, PIBpc, taxa_escolarizacao)]
+janela <- rdbwselect(
+  x = dt_individuais$votos_razao_pp_centr,
+  y = dt_individuais$valor_empenhado_ipca_pc,
+  p = 1,
+  covs = covariadas
+)
+janela$bws
+```
+
+```{r}
+# Filtrar base de dados para municípios cuja margem de vitória do PP está na janela
+dt_todas <- dt_todas[votos_razao_pp_centr >= -janela$bws[1] &
+                       votos_razao_pp_centr <= janela$bws[1]]
+dt_individuais <- dt_individuais[votos_razao_pp_centr >= -janela$bws[1] &
+                                   votos_razao_pp_centr <= janela$bws[1]]
+dt_bancada <- dt_bancada[votos_razao_pp_centr >= -janela$bws[1] &
+                           votos_razao_pp_centr <= janela$bws[1]]
+dt_relator <- dt_relator[votos_razao_pp_centr >= -janela$bws[1] &
+                           votos_razao_pp_centr <= janela$bws[1]]
 
 # Ver quantos municípios com eleições acirradas receberam emendas
 writeLines(paste0(
@@ -883,34 +853,9 @@ regs_flexiveis <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_
 regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_individuais)
 
 
-# Resultados
-## Completo
+# Resultados - Linear
 nomes_variaveis <- c(
-  "votos_razao_pp_centr_sq" = "Razão de votos do PP ao quadrado",
-  "votos_razao_pp_centr" = "Razão de votos do PP",
-  "vitoria_pp" = "Prefeito do PP"
-)
-linhas_adicionais <- tribble(~variavel, ~linear, ~linear_controles, ~quad, ~quad_controles,
-                  'Forma funcional', "Linear", "Linear", "Quadrática", "Quadrática",
-                  'Controles municipais', "Não", "Sim", "Não", "Sim")
-modelsummary(list(
-    "Linear sem controles" = regs_lineares,
-    "Linear com controles" = regs_lineares_controles,
-    "Quadrático sem controles" = regs_flexiveis,
-    "Quadrático com controles" = regs_flexiveis_controles
-  ),
-  statistic = NULL,
-  stars = T,
-  gof_omit = "R2|AIC|BIC|RMSE",
-  coef_rename = nomes_variaveis,
-  coef_omit = 5:12,
-  add_rows = linhas_adicionais,
-  output = "Resultados/ValorEmpenhadoPerCapitaIndividuaisFinal.png"
-)
-
-## Linear
-nomes_variaveis <- c(
-  "votos_razao_pp_centr" = "Razão de votos do PP",
+  "votos_razao_pp_centr" = "Margem de vitória do PP",
   "vitoria_pp" = "Prefeito do PP"
 )
 linhas_adicionais <- tribble(~variavel, ~linear, ~linear_controles,
@@ -928,29 +873,6 @@ modelsummary(list(
   add_rows = linhas_adicionais,
   output = "Resultados/ValorEmpenhadoPerCapitaIndividuaisLinear.png"
 )
-
-## Quadrático
-nomes_variaveis <- c(
-  "votos_razao_pp_centr_sq" = "Razão de votos do PP ao quadrado",
-  "votos_razao_pp_centr" = "Razão de votos do PP",
-  "vitoria_pp" = "Prefeito do PP"
-)
-linhas_adicionais <- tribble(~variavel, ~quad, ~quad_controles,
-                  'Forma funcional', "Quadrática", "Quadrática",
-                  'Controles municipais', "Não", "Sim")
-modelsummary(list(
-    "Quadrático sem controles" = regs_flexiveis,
-    "Quadrático com controles" = regs_flexiveis_controles
-  ),
-  statistic = NULL,
-  stars = T,
-  gof_omit = "R2|AIC|BIC|RMSE",
-  coef_rename = nomes_variaveis,
-  coef_omit = 7:14,
-  add_rows = linhas_adicionais,
-  output = "Resultados/ValorEmpenhadoPerCapitaIndividuaisQuad.png"
-)
-
 ```
 
 # 4) Teste de heterogeneidade
@@ -1000,3 +922,355 @@ Vamos repetir a estimação por região, mas precisamos prestar atenção no nú
 # 5) Teste placebo
 
 Não vamos fazer, já que não encontramos efeito. (Se encontramos efeito para certa região, fazer para ela.)
+
+# 6) Teste de robustez: Modelo quadrático
+
+Vamos repetir as estatísticas e estimação para modelos quadráticos.
+
+## 6.1) Verificação de (des)continuidades
+
+Note que filtramos os municípios para os percentis 2 a 99 de cada característica para evitar distorções causadas por outliers.
+
+### 6.1.1) Características municipais
+
+```{r}
+#| label: grafico_caracteristicas_municipais_por_razao_votos_pp_quad
+
+# Recuperação das versões completas das bases de dados
+
+# Guardar bases de dados completas
+dt_todas <- dt_todas_completa
+dt_individuais <- dt_individuais_completa
+dt_bancada <- dt_bancada_completa
+dt_relator <- dt_relator_completa
+
+
+# Linear
+g_pop <- dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp_centr, y = pop, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, size = 0.5, color = "black") +
+  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
+  labs(title = "",
+       y = "População",
+       x = "Margem de vitória do PP") + scale_x_continuous(labels = label_percent()) + scale_x_continuous(labels = label_percent())
+
+g_densidade_demografica <- dt_todas[densidade_demografica %between% quantile(densidade_demografica, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp_centr, y = densidade_demografica, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, size = 0.5, color = "black") +
+  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
+  labs(title = "",
+       y = "Densidade\ndemográfica",
+       x = "Margem de vitória do PP") + scale_x_continuous(labels = label_percent())
+
+g_PIBpc <- dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp_centr, y = PIBpc, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, size = 0.5, color = "black") +
+  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
+  labs(title = "",
+       y = "PIB per capita",
+       x = "Margem de vitória do PP") + scale_x_continuous(labels = label_percent())
+
+g_taxa_escolarizacao <- dt_todas[taxa_escolarizacao %between% quantile(taxa_escolarizacao, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp_centr, y = taxa_escolarizacao, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, size = 0.5, color = "black") +
+  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
+  labs(title = "",
+       y = "Taxa de\nescolarização",
+       x = "Margem de vitória do PP") + scale_x_continuous(labels = label_percent())
+
+plot_grid(g_pop, g_densidade_demografica, g_PIBpc, g_taxa_escolarizacao, ncol = 2)
+```
+
+### 6.1.2) Valor empenhado *per capita* de emendas parlamentares
+
+```{r}
+#| label: grafico_valor_empenhado_por_razao_votos_pp_quad
+
+# Linear
+dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_pc, c(.02, .99), na.rm = TRUE)] %>%
+  ggplot(aes(x = votos_razao_pp_centr, y = valor_empenhado_ipca_pc, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, color = "black") +
+  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
+  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
+  labs(title = "",
+       y = "Valor empenhado per capita",
+       x = "Margem de vitória do PP") + scale_x_continuous(labels = label_percent())
+```
+
+## 6.2) Comparação entre tratados e controles
+
+### 6.2.0) Obter janela ótima e filtrar bases de dados
+
+Agora, vamos mostrar que os municípios em que o candidato do PP ganhou vs. perdeu por pouco de fato são semelhantes. Para isso, vamos filtrar as bases de dados por eleições acirradas.
+
+```{r}
+# Obter janela ótima para modelo quadrático
+### Sem covariadas
+janela_outra <- rdbwselect(
+  x = dt_individuais$votos_razao_pp_centr,
+  y = dt_individuais$valor_empenhado_ipca_pc,
+  p = 2
+)
+janela_outra$bws
+### Com covariadas
+covariadas <- dt_individuais[, .(pop, densidade_demografica, PIBpc, taxa_escolarizacao)]
+janela <- rdbwselect(
+  x = dt_individuais$votos_razao_pp_centr,
+  y = dt_individuais$valor_empenhado_ipca_pc,
+  p = 2,
+  covs = covariadas
+)
+janela$bws
+```
+
+```{r}
+# Filtrar base de dados para municípios cuja margem de vitória do PP está na janela
+dt_todas <- dt_todas[votos_razao_pp_centr >= -janela$bws[1] &
+                       votos_razao_pp_centr <= janela$bws[1]]
+dt_individuais <- dt_individuais[votos_razao_pp_centr >= -janela$bws[1] &
+                                   votos_razao_pp_centr <= janela$bws[1]]
+dt_bancada <- dt_bancada[votos_razao_pp_centr >= -janela$bws[1] &
+                           votos_razao_pp_centr <= janela$bws[1]]
+dt_relator <- dt_relator[votos_razao_pp_centr >= -janela$bws[1] &
+                           votos_razao_pp_centr <= janela$bws[1]]
+
+# Ver quantos municípios com eleições acirradas receberam emendas
+writeLines(paste0(
+  "Quantidade de municípios com eleições acirradas: ", 
+  nrow(dt_todas),
+  
+  "\nQuantidade de municípios com eleições acirradas que receberam emendas: ", 
+  nrow(dt_todas[valor_empenhado_ipca != 0]),
+
+  "\nQuantidade de municípios com eleições acirradas que receberam emendas individuais: ",
+  nrow(dt_individuais[valor_empenhado_ipca != 0]),
+  
+  "\nQuantidade de municípios com eleições acirradas que receberam emendas de bancada: ",
+  nrow(dt_bancada[valor_empenhado_ipca != 0]),
+  
+  "\nQuantidade de municípios com eleições acirradas que receberam emendas de relator: ",
+  nrow(dt_relator[valor_empenhado_ipca != 0])))
+```
+
+-   Note que nenhum município com eleições acirradas recebeu emendas de relator e somente 5 receberam emendas de bancada, então vamos analisar somente emendas individuais.
+
+### 6.2.1) Características municipais
+
+#### 6.2.1.1) Via médias
+
+```{r}
+#| label: grafico_barras_medias_caracteristicas_municipais_quad
+
+# Criar dt com médias
+medias_municipios_eleicoes <- dt_municipios_eleicoes[
+  ,
+  .(
+    media_pop = mean(pop),
+    media_densidade_demografica = mean(densidade_demografica),
+    media_PIBpc = mean(PIBpc),
+    media_taxa_escolarizacao = mean(taxa_escolarizacao),
+    media_mortalidade_infantil = mean(mortalidade_infantil, na.rm = T)
+  ),
+  by = vitoria_pp
+]
+
+# Plotar médias de quem venceu vs. não venceu - formatar
+titulo <- ggplot() + 
+  labs(title = "Comparação das médias de características municipais", subtitle = "Fontes dos dados: TSE, IBGE (2021, 2022). Elaboração própria.") +
+  theme_minimal(base_family = "CMU Serif")
+
+g1 <- medias_municipios_eleicoes %>%
+  ggplot(aes(y = media_pop, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal(base_family = "CMU Serif") + guides(color = "none") +
+  labs(title = "",
+       y = "População",
+       x = "Prefeito do PP?")
+
+g2 <- medias_municipios_eleicoes %>%
+  ggplot(aes(y = media_densidade_demografica, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal(base_family = "CMU Serif") +
+  labs(title = "",
+       y = "Densidade\ndemográfica",
+       x = "Prefeito do PP?")
+
+g3 <- medias_municipios_eleicoes %>%
+  ggplot(aes(y = media_PIBpc, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal(base_family = "CMU Serif") +
+  labs(title = "",
+       y = "PIB per capita",
+       x = "Prefeito do PP?")
+
+g4 <- medias_municipios_eleicoes %>%
+  ggplot(aes(y = media_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal(base_family = "CMU Serif") +
+  labs(title = "",
+       y = "Taxa de escolarização",
+       x = "Prefeito do PP?")
+
+g5 <- medias_municipios_eleicoes %>%
+  ggplot(aes(y = media_mortalidade_infantil, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal(base_family = "CMU Serif") +
+  labs(title = "",
+       y = "Mortalidade infantil",
+       x = "Prefeito do PP?")
+
+graficos <- plot_grid(g1, g2, g3, g4, g5)
+
+# plot_grid(graficos, ncol = 1, rel_heights = c(0.15, 1))
+graficos
+
+rm(medias_municipios_eleicoes, titulo, graficos, g1, g2, g3, g4, g5)
+
+# Mostrar quais diferenças são estatisticamente significantes - fazer teste de comparação des
+
+```
+
+-   As médias de população e Densidade\\ndemográfica são bastante diferentes entre os dois grupos. Vamos olhar para a mediana, que reduz o efeito de outliers:
+
+#### 6.2.1.1) Via medianas
+
+```{r}
+#| label: grafico_barras_medianas_caracteristicas_municipais_quad
+
+# Criar dt com medianas
+medianas_municipios_eleicoes <- dt_municipios_eleicoes[
+  ,
+  .(
+    mediana_pop = median(pop),
+    mediana_densidade_demografica = median(densidade_demografica),
+    mediana_PIBpc = median(PIBpc),
+    mediana_taxa_escolarizacao = median(taxa_escolarizacao),
+    mediana_mortalidade_infantil = median(mortalidade_infantil, na.rm = T)
+  ),
+  by = vitoria_pp
+]
+
+# Plotar medianas de quem venceu vs. não venceu - formatar
+titulo <- ggplot() + 
+  labs(title = "Comparação das medianas de características municipais", subtitle = "Fontes dos dados: TSE (2021), IBGE (2021, 2022). Elaboração própria.") + 
+  theme_minimal(base_family = "CMU Serif")
+
+g1 <- medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_pop, x = as.factor(vitoria_pp), data = )) +
+  geom_col() +
+  theme_minimal(base_family = "CMU Serif") +
+  labs(title = "",
+       y = "População",
+       x = "Prefeito do PP?")
+
+g2 <- medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_densidade_demografica, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal(base_family = "CMU Serif") +
+  labs(title = "",
+       y = "Densidade\ndemográfica",
+       x = "Prefeito do PP?")
+
+g3 <- medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_PIBpc, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal(base_family = "CMU Serif") +
+  labs(title = "",
+       y = "PIB per capita",
+       x = "Prefeito do PP?")
+
+g4 <- medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_taxa_escolarizacao, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal(base_family = "CMU Serif") +
+  labs(title = "",
+       y = "Taxa de escolarização",
+       x = "Prefeito do PP?")
+
+g5 <- medianas_municipios_eleicoes %>%
+  ggplot(aes(y = mediana_mortalidade_infantil, x = as.factor(vitoria_pp))) +
+  geom_col() +
+  theme_minimal(base_family = "CMU Serif") +
+  labs(title = "",
+       y = "Mortalidade infantil",
+       x = "Prefeito do PP?")
+
+graficos <- plot_grid(g1, g2, g3, g4, g5)
+
+# plot_grid(titulo, graficos, ncol = 1, rel_heights = c(0.15, 1))
+graficos
+
+rm(medianas_municipios_eleicoes, titulo, graficos, g1, g2, g3, g4, g5)
+```
+
+-   Usando a mediana, as médias de população e Densidade\\ndemográfica ficaram bem mais parecidas.
+
+### 6.2.2) Valores empenhados de emendas parlamentares
+
+Vamos calcular a diferença de médias dos valores empenhados per capita dos municípios que tiveram eleições acirradas e elegeram ou não o candidato do PP, o que seria equivalente a ATT dado homogeneidade dos grupos de controle e tratamento.
+
+```{r}
+#| label: grafico_barras_medias_emendas_parlamentares_quad
+
+medias_valor_empenhado_ipca_pc <- dt_individuais[, .(media_empenho = mean(valor_empenhado_ipca_pc)), by = vitoria_pp]
+
+medias_valor_empenhado_ipca_pc[vitoria_pp == 1, media_empenho] - medias_valor_empenhado_ipca_pc[vitoria_pp == 0, media_empenho]
+```
+
+-   Perceba que é uma diferença pequena e negativa, o que não corrobora nossa hipótese.
+
+## 6.3) Estimação
+
+Vamos estimar o valor adicional recebido via emendas parlamentares individuaispelos municípios em que o candidato a prefeito do PP ganhou por pouco, usando alguns modelos diferentes.
+
+-   Note que, quando o modelo inclui a running variable, é sua versão centralizada (votos_razao_pp_centr), porque isso evita que o intercepto tenha valores sem sentido (como valores empenhados negativos).
+
+```{r}
+
+# Duas regressões quadráticas sem controles de município
+regs_flexiveis <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq, data = dt_individuais)
+
+# Duas regressões quadráticas com controles de município
+regs_flexiveis_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_centr + vitoria_pp*votos_razao_pp_centr_sq + regiao + pop + densidade_demografica + PIBpc + taxa_escolarizacao, data = dt_individuais)
+
+
+# Resultados - Quadrático
+nomes_variaveis <- c(
+  "votos_razao_pp_centr" = "Margem de vitória do PP",
+  "vitoria_pp" = "Prefeito do PP"
+)
+linhas_adicionais <- tribble(~variavel, ~linear, ~linear_controles,
+                  'Forma funcional', "Quadrático", "Quadrático",
+                  'Controles municipais', "Não", "Sim")
+modelsummary(list(
+    "Quadrático sem controles" = regs_flexiveis,
+    "Quadrático com controles" = regs_flexiveis_controles
+  ),
+  statistic = NULL,
+  stars = T,
+  gof_omit = "R2|AIC|BIC|RMSE",
+  coef_rename = nomes_variaveis,
+  coef_omit = 5:12,
+  add_rows = linhas_adicionais,
+  output = "Resultados/ValorEmpenhadoPerCapitaIndividuaisQuadratico.png"
+)
+```
