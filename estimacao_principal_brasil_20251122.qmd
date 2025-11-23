@@ -34,10 +34,6 @@ library(cowplot) # para visualização dos dados (plotá-los lado a lado)
 library(scales) # para visualização dos dados (fazer eixos bonito)
 library(estimatr) # para modelagem
 library(modelsummary) # para visualização de resultados dos modelos
-library(extrafont) # para usar fonte do LaTeX
-
-# Carregar fonte Computer Modern
-
 ```
 
 # 1) Coleta e junção de dados
@@ -54,7 +50,7 @@ library(extrafont) # para usar fonte do LaTeX
 
     -   População no último censo (2022)
 
-    -   Densidade demográfica (2022)
+    -   Densidade\\ndemográfica (2022)
 
     -   PIB *per capita* municipal (2021)
 
@@ -185,9 +181,9 @@ str(dt_municipios)
 dt_eleicoes <- readRDS("Bases de dados/Brasil/TSE_eleicoes.rds")
 setDT(dt_eleicoes)
 
-# Retirar municípios que tiveram eleições suplementares, identificados pela presença de mais de um candidato eleito na base
+# Retirar municípios que tiveram eleições suplementares (identificados pela presença de mais de um candidato eleito na base) e Cachoeira dos Índios, que parece ter passado por algo parecido
 municipios_com_mais_de_um_eleito <- dt_eleicoes[resultado == "eleito", .N, by = id_municipio][N>1, unique(id_municipio)]
-dt_eleicoes <- dt_eleicoes[!(id_municipio %in% municipios_com_mais_de_um_eleito)]
+dt_eleicoes <- dt_eleicoes[!(id_municipio %in% municipios_com_mais_de_um_eleito) & id_municipio != 2503308]
 rm(municipios_com_mais_de_um_eleito)
 
 # Retirar primeiro turno dos municípios que tiveram segundo turno
@@ -536,7 +532,7 @@ g_pop <- dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
   theme_minimal() + guides(color = "none") +
   labs(title = "",
        y = "População",
-       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
+       x = "Razão de votos do PP")
 
 g_densidade_demografica <- dt_todas[densidade_demografica %between% quantile(densidade_demografica, c(.02, .99), na.rm = TRUE)] %>%
   ggplot(aes(x = votos_razao_pp, y = densidade_demografica, color = as.factor(vitoria_pp))) +
@@ -548,7 +544,7 @@ g_densidade_demografica <- dt_todas[densidade_demografica %between% quantile(den
   theme_minimal() + guides(color = "none") +
   labs(title = "",
        y = "Densidade\ndemográfica",
-       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
+       x = "Razão de votos do PP")
 
 g_PIBpc <- dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] %>%
   ggplot(aes(x = votos_razao_pp, y = PIBpc, color = as.factor(vitoria_pp))) +
@@ -560,7 +556,7 @@ g_PIBpc <- dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] 
   theme_minimal() + guides(color = "none") +
   labs(title = "",
        y = "PIB per capita",
-       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
+       x = "Razão de votos do PP")
 
 g_taxa_escolarizacao <- dt_todas[taxa_escolarizacao %between% quantile(taxa_escolarizacao, c(.02, .99), na.rm = TRUE)] %>%
   ggplot(aes(x = votos_razao_pp, y = taxa_escolarizacao, color = as.factor(vitoria_pp))) +
@@ -572,11 +568,9 @@ g_taxa_escolarizacao <- dt_todas[taxa_escolarizacao %between% quantile(taxa_esco
   theme_minimal() + guides(color = "none") +
   labs(title = "",
        y = "Taxa de\nescolarização",
-       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
+       x = "Razão de votos do PP")
 
 plot_grid(g_pop, g_densidade_demografica, g_PIBpc, g_taxa_escolarizacao, ncol = 2)
-
-ggsave("Graficos/ContinuidadeCaracteristicas.png", width = 10, height = 7, bg = "white")
 ```
 
 ### 2.2.1) Valor empenhado *per capita* de emendas parlamentares
@@ -593,7 +587,7 @@ dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_p
   theme_minimal() + guides(color = "none") +
   labs(title = "",
        y = "Valor empenhado per capita",
-       x = "Razão de votos do PP \n(considerando os 2 candidatos mais votados)")
+       x = "Razão de votos do PP")
 ```
 
 ## 2.2) Comparação entre tratados e controles
@@ -667,7 +661,7 @@ g2 <- medias_municipios_eleicoes %>%
   geom_col() +
   theme_minimal() +
   labs(title = "",
-       y = "Densidade demográfica",
+       y = "Densidade\ndemográfica",
        x = "Prefeito do PP?")
 
 g3 <- medias_municipios_eleicoes %>%
@@ -703,7 +697,7 @@ rm(medias_municipios_eleicoes, titulo, graficos, g1, g2, g3, g4, g5)
 
 ```
 
--   As médias de população e densidade demográfica são bastante diferentes entre os dois grupos. Vamos olhar para a mediana, que reduz o efeito de outliers:
+-   As médias de população e Densidade\\ndemográfica são bastante diferentes entre os dois grupos. Vamos olhar para a mediana, que reduz o efeito de outliers:
 
 #### 2.2.1.1) Via medianas
 
@@ -741,7 +735,7 @@ g2 <- medianas_municipios_eleicoes %>%
   geom_col() +
   theme_minimal() +
   labs(title = "",
-       y = "Densidade demográfica",
+       y = "Densidade\ndemográfica",
        x = "Prefeito do PP?")
 
 g3 <- medianas_municipios_eleicoes %>%
@@ -774,7 +768,7 @@ plot_grid(titulo, graficos, ncol = 1, rel_heights = c(0.15, 1))
 rm(medianas_municipios_eleicoes, titulo, graficos, g1, g2, g3, g4, g5)
 ```
 
--   Usando a mediana, as médias de população e densidade demográfica ficaram bem mais parecidas.
+-   Usando a mediana, as médias de população e Densidade\\ndemográfica ficaram bem mais parecidas.
 
 ### 2.2.2) Valores empenhados de emendas parlamentares
 
