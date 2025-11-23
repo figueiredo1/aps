@@ -40,7 +40,6 @@ library(modelsummary) # para visualização de resultados dos modelos
 # Carregar fonte Computer Modern
 font_add("CMU Serif", "Fontes/cmunrm.ttf")
 showtext_auto()
-options(modelsummary_latex = "CMU Serif")
 ```
 
 # 1) Coleta e junção de dados
