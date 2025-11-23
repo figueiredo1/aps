@@ -20,9 +20,7 @@ warning: false
 
 -   Diferença em relação à versão de 21/11/2025: Filtrei por eleições acirradas só mais tarde para poder fazer os gráficos de (des)continuidades de características e valor empenhado por razão de votos do candidato a prefeito do PP; não analisei as emendas de bancada após constatar que elas são poucas
 
--   Diferença em relação à versão de 22/11/2025: Escolhi as janelas ótimas segundo o método de Calonico *et al.* em vez de arbitrariamente e coloquei as análises quadráticas como teste de robustez
-
-    -   Note que a janela ótima de modelos lineares e de modelos quadráticos são diferentes!
+-   Diferença em relação à versão de 22/11/2025: Escolhi as janelas ótimas segundo o método de Calonico *et al.* em vez de arbitrariamente e coloquei as análises quadráticas como teste de robustez e, como a janela ótima varia de acordo com controles e forma funcional, estimei um modelo linear sem controles, um modelo linear com controles e um modelo quadrático com controles separadamente (análogo ao que o Naércio fez no artigo dele)
 
 # 0) Preparativos
 
@@ -657,7 +655,7 @@ writeLines(paste0(
   nrow(dt_relator[valor_empenhado_ipca != 0])))
 ```
 
--   Note que nenhum município com eleições acirradas recebeu emendas de relator e somente 5 receberam emendas de bancada, então vamos analisar somente emendas individuais.
+-   Note que nenhum município com eleições acirradas recebeu emendas de relator e somente 7 receberam emendas de bancada, então vamos analisar somente emendas individuais.
 
 ### 2.2.1) Características municipais
 
@@ -891,7 +889,6 @@ Vamos repetir as estatísticas e estimação para o modelo linear sem controles.
 
 ```{r}
 # Recuperação das versões completas das bases de dados
-# Guardar bases de dados completas
 dt_todas <- dt_todas_completa
 dt_individuais <- dt_individuais_completa
 dt_bancada <- dt_bancada_completa
@@ -909,7 +906,7 @@ Agora, vamos mostrar que os municípios em que o candidato do PP ganhou vs. perd
 janela <- rdbwselect(
   x = dt_individuais$votos_razao_pp_centr,
   y = dt_individuais$valor_empenhado_ipca_pc,
-  p = 2
+  p = 1
 )
 janela$bws
 ```
@@ -1021,7 +1018,7 @@ rm(medias_municipios_eleicoes, titulo, graficos, g1, g2, g3, g4, g5)
 
 ```
 
--   As médias de população e Densidade\\ndemográfica são bastante diferentes entre os dois grupos. Vamos olhar para a mediana, que reduz o efeito de outliers:
+-   As médias de população e densidade demográfica são bastante diferentes entre os dois grupos. Vamos olhar para a mediana, que reduz o efeito de outliers:
 
 #### 6.2.1.1) Via medianas
 
@@ -1094,7 +1091,7 @@ graficos
 rm(medianas_municipios_eleicoes, titulo, graficos, g1, g2, g3, g4, g5)
 ```
 
--   Usando a mediana, as médias de população e Densidade\\ndemográfica ficaram bem mais parecidas.
+-   Usando a mediana, as médias de população e densidade demográfica ficaram bem mais parecidas.
 
 ### 6.2.2) Valores empenhados de emendas parlamentares
 
@@ -1135,8 +1132,6 @@ Note que filtramos os municípios para os percentis 2 a 99 de cada característi
 #| label: grafico_caracteristicas_municipais_por_razao_votos_pp_quad
 
 # Recuperação das versões completas das bases de dados
-
-# Guardar bases de dados completas
 dt_todas <- dt_todas_completa
 dt_individuais <- dt_individuais_completa
 dt_bancada <- dt_bancada_completa
@@ -1454,13 +1449,16 @@ regs_quad_controles <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_raza
 nomes_variaveis <- c(
   "votos_razao_pp_centr_sq" = "Margem de vitória do PP ao quadrado",
   "votos_razao_pp_centr" = "Margem de vitória do PP",
-  "vitoria_pp" = "Prefeito do PP",
-  "Num.Obs." = "N"
+  "vitoria_pp" = "Prefeito do PP"
+)
+gm <- tibble::tribble(
+        ~raw, ~clean, ~fmt, ~omit,
+        "nobs", "N", 0, FALSE
 )
 linhas_adicionais <- tribble(~variavel, ~linear_controles, ~linear, ~quad_controles,
+                  'Janela da margem de vitória do PP', '±8,4%', '±10,7%', '±14,5%',
                   'Forma funcional', "Linear", "Linear", "Quadrático",
-                  'Controles municipais', "Sim", "Não", "Sim",
-                  'Janela da margem de vitória do PP', '±8,4%', '±10,7%', '±14,5%')
+                  'Controles municipais', "Sim", "Não", "Sim")
 modelsummary(list(
     "Linear com controles" = regs_lineares_controles,
     "Linear sem controles" = regs_lineares,
@@ -1469,6 +1467,7 @@ modelsummary(list(
   statistic = NULL,
   stars = T,
   coef_omit = 4:11,
+  gof_map = gm,
   gof_omit = "R2|AIC|BIC|RMSE",
   coef_rename = nomes_variaveis,
   add_rows = linhas_adicionais,

@@ -234,14 +234,11 @@ Políticas Sociais}
 \item
   Diferença em relação à versão de 22/11/2025: Escolhi as janelas ótimas
   segundo o método de Calonico \emph{et al.} em vez de arbitrariamente e
-  coloquei as análises quadráticas como teste de robustez
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Note que a janela ótima de modelos lineares e de modelos quadráticos
-    são diferentes!
-  \end{itemize}
+  coloquei as análises quadráticas como teste de robustez e, como a
+  janela ótima varia de acordo com controles e forma funcional, estimei
+  um modelo linear sem controles, um modelo linear com controles e um
+  modelo quadrático com controles separadamente (análogo ao que o
+  Naércio fez no artigo dele)
 \end{itemize}
 
 \section{0) Preparativos}\label{preparativos}
@@ -1155,7 +1152,7 @@ Quantidade de municípios com eleições acirradas que receberam emendas de rela
 \tightlist
 \item
   Note que nenhum município com eleições acirradas recebeu emendas de
-  relator e somente 5 receberam emendas de bancada, então vamos analisar
+  relator e somente 7 receberam emendas de bancada, então vamos analisar
   somente emendas individuais.
 \end{itemize}
 
@@ -1454,7 +1451,6 @@ controles.
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Recuperação das versões completas das bases de dados}
-\CommentTok{\# Guardar bases de dados completas}
 \NormalTok{dt\_todas }\OtherTok{\textless{}{-}}\NormalTok{ dt\_todas\_completa}
 \NormalTok{dt\_individuais }\OtherTok{\textless{}{-}}\NormalTok{ dt\_individuais\_completa}
 \NormalTok{dt\_bancada }\OtherTok{\textless{}{-}}\NormalTok{ dt\_bancada\_completa}
@@ -1478,7 +1474,7 @@ as bases de dados por eleições acirradas.
 \NormalTok{janela }\OtherTok{\textless{}{-}} \FunctionTok{rdbwselect}\NormalTok{(}
   \AttributeTok{x =}\NormalTok{ dt\_individuais}\SpecialCharTok{$}\NormalTok{votos\_razao\_pp\_centr,}
   \AttributeTok{y =}\NormalTok{ dt\_individuais}\SpecialCharTok{$}\NormalTok{valor\_empenhado\_ipca\_pc,}
-  \AttributeTok{p =} \DecValTok{2}
+  \AttributeTok{p =} \DecValTok{1}
 \NormalTok{)}
 \NormalTok{janela}\SpecialCharTok{$}\NormalTok{bws}
 \end{Highlighting}
@@ -1486,7 +1482,7 @@ as bases de dados por eleições acirradas.
 
 \begin{verbatim}
       h (left) h (right)  b (left) b (right)
-mserd  0.11978   0.11978 0.1789485 0.1789485
+mserd 0.107061  0.107061 0.2173563 0.2173563
 \end{verbatim}
 
 \begin{Shaded}
@@ -1521,10 +1517,10 @@ mserd  0.11978   0.11978 0.1789485 0.1789485
 \end{Shaded}
 
 \begin{verbatim}
-Quantidade de municípios com eleições acirradas: 864
-Quantidade de municípios com eleições acirradas que receberam emendas: 75
-Quantidade de municípios com eleições acirradas que receberam emendas individuais: 69
-Quantidade de municípios com eleições acirradas que receberam emendas de bancada: 10
+Quantidade de municípios com eleições acirradas: 815
+Quantidade de municípios com eleições acirradas que receberam emendas: 70
+Quantidade de municípios com eleições acirradas que receberam emendas individuais: 65
+Quantidade de municípios com eleições acirradas que receberam emendas de bancada: 9
 Quantidade de municípios com eleições acirradas que receberam emendas de relator: 0
 \end{verbatim}
 
@@ -1621,9 +1617,9 @@ municipais}\label{caracteruxedsticas-municipais-3}
 \begin{itemize}
 \tightlist
 \item
-  As médias de população e Densidade\textbackslash ndemográfica são
-  bastante diferentes entre os dois grupos. Vamos olhar para a mediana,
-  que reduz o efeito de outliers:
+  As médias de população e densidade demográfica são bastante diferentes
+  entre os dois grupos. Vamos olhar para a mediana, que reduz o efeito
+  de outliers:
 \end{itemize}
 
 \paragraph{6.2.1.1) Via medianas}\label{via-medianas-1}
@@ -1706,8 +1702,8 @@ municipais}\label{caracteruxedsticas-municipais-3}
 \begin{itemize}
 \tightlist
 \item
-  Usando a mediana, as médias de população e
-  Densidade\textbackslash ndemográfica ficaram bem mais parecidas.
+  Usando a mediana, as médias de população e densidade demográfica
+  ficaram bem mais parecidas.
 \end{itemize}
 
 \subsubsection{6.2.2) Valores empenhados de emendas
@@ -1727,7 +1723,7 @@ grupos de controle e tratamento.
 \end{Shaded}
 
 \begin{verbatim}
-[1] -1.019101
+[1] -1.177472
 \end{verbatim}
 
 \begin{itemize}
@@ -1776,8 +1772,6 @@ municipais}\label{caracteruxedsticas-municipais-4}
 \begin{Shaded}
 \begin{Highlighting}[]
 \CommentTok{\# Recuperação das versões completas das bases de dados}
-
-\CommentTok{\# Guardar bases de dados completas}
 \NormalTok{dt\_todas }\OtherTok{\textless{}{-}}\NormalTok{ dt\_todas\_completa}
 \NormalTok{dt\_individuais }\OtherTok{\textless{}{-}}\NormalTok{ dt\_individuais\_completa}
 \NormalTok{dt\_bancada }\OtherTok{\textless{}{-}}\NormalTok{ dt\_bancada\_completa}
@@ -2187,13 +2181,16 @@ por pouco, usando alguns modelos diferentes.
 \NormalTok{nomes\_variaveis }\OtherTok{\textless{}{-}} \FunctionTok{c}\NormalTok{(}
   \StringTok{"votos\_razao\_pp\_centr\_sq"} \OtherTok{=} \StringTok{"Margem de vitória do PP ao quadrado"}\NormalTok{,}
   \StringTok{"votos\_razao\_pp\_centr"} \OtherTok{=} \StringTok{"Margem de vitória do PP"}\NormalTok{,}
-  \StringTok{"vitoria\_pp"} \OtherTok{=} \StringTok{"Prefeito do PP"}\NormalTok{,}
-  \StringTok{"Num.Obs."} \OtherTok{=} \StringTok{"N"}
+  \StringTok{"vitoria\_pp"} \OtherTok{=} \StringTok{"Prefeito do PP"}
+\NormalTok{)}
+\NormalTok{gm }\OtherTok{\textless{}{-}}\NormalTok{ tibble}\SpecialCharTok{::}\FunctionTok{tribble}\NormalTok{(}
+        \SpecialCharTok{\textasciitilde{}}\NormalTok{raw, }\SpecialCharTok{\textasciitilde{}}\NormalTok{clean, }\SpecialCharTok{\textasciitilde{}}\NormalTok{fmt, }\SpecialCharTok{\textasciitilde{}}\NormalTok{omit,}
+        \StringTok{"nobs"}\NormalTok{, }\StringTok{"N"}\NormalTok{, }\DecValTok{0}\NormalTok{, }\ConstantTok{FALSE}
 \NormalTok{)}
 \NormalTok{linhas\_adicionais }\OtherTok{\textless{}{-}} \FunctionTok{tribble}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{variavel, }\SpecialCharTok{\textasciitilde{}}\NormalTok{linear\_controles, }\SpecialCharTok{\textasciitilde{}}\NormalTok{linear, }\SpecialCharTok{\textasciitilde{}}\NormalTok{quad\_controles,}
+                  \StringTok{\textquotesingle{}Janela da margem de vitória do PP\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}±8,4\%\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}±10,7\%\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}±14,5\%\textquotesingle{}}\NormalTok{,}
                   \StringTok{\textquotesingle{}Forma funcional\textquotesingle{}}\NormalTok{, }\StringTok{"Linear"}\NormalTok{, }\StringTok{"Linear"}\NormalTok{, }\StringTok{"Quadrático"}\NormalTok{,}
-                  \StringTok{\textquotesingle{}Controles municipais\textquotesingle{}}\NormalTok{, }\StringTok{"Sim"}\NormalTok{, }\StringTok{"Não"}\NormalTok{, }\StringTok{"Sim"}\NormalTok{,}
-                  \StringTok{\textquotesingle{}Janela da margem de vitória do PP\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}±8,4\%\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}±10,7\%\textquotesingle{}}\NormalTok{, }\StringTok{\textquotesingle{}±14,5\%\textquotesingle{}}\NormalTok{)}
+                  \StringTok{\textquotesingle{}Controles municipais\textquotesingle{}}\NormalTok{, }\StringTok{"Sim"}\NormalTok{, }\StringTok{"Não"}\NormalTok{, }\StringTok{"Sim"}\NormalTok{)}
 \FunctionTok{modelsummary}\NormalTok{(}\FunctionTok{list}\NormalTok{(}
     \StringTok{"Linear com controles"} \OtherTok{=}\NormalTok{ regs\_lineares\_controles,}
     \StringTok{"Linear sem controles"} \OtherTok{=}\NormalTok{ regs\_lineares,}
@@ -2202,6 +2199,7 @@ por pouco, usando alguns modelos diferentes.
   \AttributeTok{statistic =} \ConstantTok{NULL}\NormalTok{,}
   \AttributeTok{stars =}\NormalTok{ T,}
   \AttributeTok{coef\_omit =} \DecValTok{4}\SpecialCharTok{:}\DecValTok{11}\NormalTok{,}
+  \AttributeTok{gof\_map =}\NormalTok{ gm,}
   \AttributeTok{gof\_omit =} \StringTok{"R2|AIC|BIC|RMSE"}\NormalTok{,}
   \AttributeTok{coef\_rename =}\NormalTok{ nomes\_variaveis,}
   \AttributeTok{add\_rows =}\NormalTok{ linhas\_adicionais,}
