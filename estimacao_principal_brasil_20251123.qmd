@@ -537,7 +537,7 @@ g_pop <- dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
   geom_point(shape = 21, size = 0.5, color = "black") +
   stat_smooth(method = "lm", se = F) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
   theme_minimal() + guides(color = "none") +
   labs(title = "",
@@ -549,7 +549,7 @@ g_densidade_demografica <- dt_todas[densidade_demografica %between% quantile(den
   geom_point(shape = 21, size = 0.5, color = "black") +
   stat_smooth(method = "lm", se = F) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
   theme_minimal() + guides(color = "none") +
   labs(title = "",
@@ -561,7 +561,7 @@ g_PIBpc <- dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] 
   geom_point(shape = 21, size = 0.5, color = "black") +
   stat_smooth(method = "lm", se = F) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
   theme_minimal() + guides(color = "none") +
   labs(title = "",
@@ -573,7 +573,7 @@ g_taxa_escolarizacao <- dt_todas[taxa_escolarizacao %between% quantile(taxa_esco
   geom_point(shape = 21, size = 0.5, color = "black") +
   stat_smooth(method = "lm", se = F) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
   theme_minimal() + guides(color = "none") +
   labs(title = "",
@@ -594,7 +594,7 @@ dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_p
   geom_point(shape = 21, color = "black") +
   stat_smooth(method = "lm", formula = y ~ x, se = F) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
   theme_minimal() + guides(color = "none") +
   labs(title = "",
@@ -1144,7 +1144,7 @@ g_pop <- dt_todas[pop %between% quantile(pop, c(.02, .99), na.rm = TRUE)] %>%
   geom_point(shape = 21, size = 0.5, color = "black") +
   stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
   theme_minimal() + guides(color = "none") +
   labs(title = "",
@@ -1156,7 +1156,7 @@ g_densidade_demografica <- dt_todas[densidade_demografica %between% quantile(den
   geom_point(shape = 21, size = 0.5, color = "black") +
   stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
   theme_minimal() + guides(color = "none") +
   labs(title = "",
@@ -1168,7 +1168,7 @@ g_PIBpc <- dt_todas[PIBpc %between% quantile(PIBpc, c(.02, .99), na.rm = TRUE)] 
   geom_point(shape = 21, size = 0.5, color = "black") +
   stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
   theme_minimal() + guides(color = "none") +
   labs(title = "",
@@ -1180,7 +1180,7 @@ g_taxa_escolarizacao <- dt_todas[taxa_escolarizacao %between% quantile(taxa_esco
   geom_point(shape = 21, size = 0.5, color = "black") +
   stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
   theme_minimal() + guides(color = "none") +
   labs(title = "",
@@ -1201,7 +1201,7 @@ dt_individuais[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_p
   geom_point(shape = 21, color = "black") +
   stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
   scale_color_brewer(palette = "Dark2", direction = -1) +
-  geom_vline(xintercept = 0.5, linetype = "dashed") +
+  geom_vline(xintercept = 0, linetype = "dashed") +
   scale_y_continuous(labels = label_number()) +
   theme_minimal() + guides(color = "none") +
   labs(title = "",
