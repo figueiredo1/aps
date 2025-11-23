@@ -1453,7 +1453,7 @@ nomes_variaveis <- c(
 )
 gm <- tibble::tribble(
         ~raw, ~clean, ~fmt, ~omit,
-        "nobs", "N", 0, FALSE
+        "nobs", "Número de observações", 0, FALSE
 )
 linhas_adicionais <- tribble(~variavel, ~linear_controles, ~linear, ~quad_controles,
                   'Janela da margem de vitória do PP', '±8,4%', '±10,7%', '±14,5%',
