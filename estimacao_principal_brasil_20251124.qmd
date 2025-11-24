@@ -845,7 +845,7 @@ regs_lineares <- lm_robust(valor_empenhado_ipca_pc ~ vitoria_pp*votos_razao_pp_c
 ```{r}
 #| label: grafico_valor_empenhado_por_razao_votos_pp_linear_sem_controles
 
-dt_todas[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_pc, c(.02, .99), na.rm = TRUE)] %>%
+dt_individuais %>%
   ggplot(aes(x = votos_razao_pp_centr, y = valor_empenhado_ipca_pc, color = as.factor(vitoria_pp))) +
   geom_point(shape = 21, size = 0.5, color = "black") +
   stat_smooth(method = "lm", se = F, formula = y ~ x) +
@@ -854,7 +854,19 @@ dt_todas[valor_empenhado_ipca_pc %between% quantile(valor_empenhado_ipca_pc, c(.
   scale_y_continuous(labels = label_number()) +
   theme_minimal() + guides(color = "none") +
   labs(title = "",
-       y = "Taxa de\nescolarização",
+       y = "Valor empenhado per capita",
+       x = "Margem de vitória do PP") + scale_x_continuous(labels = label_percent())
+
+dt_individuais %>%
+  ggplot(aes(x = votos_razao_pp_centr, y = valor_empenhado_ipca_pc, color = as.factor(vitoria_pp))) +
+  geom_point(shape = 21, size = 0.5, color = "black") +
+  stat_smooth(method = "lm", se = F, formula = y ~ poly(x, 2)) +
+  scale_color_brewer(palette = "Dark2", direction = -1) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_y_continuous(labels = label_number()) +
+  theme_minimal() + guides(color = "none") +
+  labs(title = "",
+       y = "Valor empenhado per capita",
        x = "Margem de vitória do PP") + scale_x_continuous(labels = label_percent())
 ```
 
